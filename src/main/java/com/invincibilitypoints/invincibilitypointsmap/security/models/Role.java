@@ -21,7 +21,7 @@ public class Role implements Serializable  {
     Integer id ;
     @Column(unique = true)
     @Enumerated(EnumType.STRING)
-    RoleName roleName ;
+    RoleName roleName;
 
     public Role (RoleName roleName) {this.roleName = roleName;}
     public String getRoleName() {

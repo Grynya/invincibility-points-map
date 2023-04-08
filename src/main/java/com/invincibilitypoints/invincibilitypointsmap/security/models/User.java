@@ -1,6 +1,7 @@
 package com.invincibilitypoints.invincibilitypointsmap.security.models;
 
 import com.invincibilitypoints.invincibilitypointsmap.model.Point;
+import com.invincibilitypoints.invincibilitypointsmap.model.UserStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -41,12 +42,18 @@ public class User implements Serializable , UserDetails {
     @OneToMany(mappedBy="userOwner")
     private Set<Point> points;
 
-    private String googleOAuth2Token;
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private UserStatus userStatus = UserStatus.INACTIVE;
 
     @ManyToMany(mappedBy = "usersWhoLiked")
     Set<Point> likedPoints;
     @ManyToMany(fetch = FetchType.EAGER  , cascade = CascadeType.PERSIST)
-    List <Role> roles ;
+    List <Role> roles;
+
+    private String googleOAuth2Token;
+
+    private String code;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

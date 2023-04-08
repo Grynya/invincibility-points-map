@@ -1,5 +1,6 @@
 package com.invincibilitypoints.invincibilitypointsmap;
 
+import com.invincibilitypoints.invincibilitypointsmap.model.UserStatus;
 import com.invincibilitypoints.invincibilitypointsmap.security.businessLogic.UserService;
 import com.invincibilitypoints.invincibilitypointsmap.security.models.Role;
 import com.invincibilitypoints.invincibilitypointsmap.security.models.RoleName;
@@ -32,7 +33,8 @@ public class InvincibilityPointsMapApplication {
         if (userRepository.findByEmail("admin@gmail.com").isEmpty())
             userService.saverUser(new User(null, "name", "surname", "admin@gmail.com",
                 passwordEncoder.encode("adminPassword"),
-                new HashSet<>(), null, new HashSet<>(), new ArrayList<>()));
+                new HashSet<>(), UserStatus.ACTIVE, new HashSet<>(), new ArrayList<>(), null,
+                    null));
 
         Role role = roleRepository.findByRoleName(RoleName.ADMIN);
         User user = userRepository.findByEmail("admin@gmail.com").orElse(null);
@@ -40,8 +42,4 @@ public class InvincibilityPointsMapApplication {
         userService.saverUser(user);
 
     };}
-
-//    private User createAdminUser() {
-//        return new User(null, "name", "surname", "admin@gmail.com", "admin", null)
-//    }
 }
