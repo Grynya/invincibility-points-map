@@ -1,7 +1,6 @@
 package com.invincibilitypoints.invincibilitypointsmap.security.models;
 
-public enum RoleName {
-
-    ADMIN , USER
-
+public enum ERole {
+  ROLE_USER,
+  ROLE_ADMIN
 }

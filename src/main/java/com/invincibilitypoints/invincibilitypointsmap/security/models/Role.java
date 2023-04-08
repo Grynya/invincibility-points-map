@@ -1,30 +1,24 @@
 package com.invincibilitypoints.invincibilitypointsmap.security.models;
 
 import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
-
-import java.io.Serializable;
-
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
-public class Role implements Serializable  {
+@Table(name = "roles")
+public class Role {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
 
+	@Enumerated(EnumType.STRING)
+	@Column(length = 20, unique = true)
+	private ERole name;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Integer id ;
-    @Column(unique = true)
-    @Enumerated(EnumType.STRING)
-    RoleName roleName;
-
-    public Role (RoleName roleName) {this.roleName = roleName;}
-    public String getRoleName() {
-        return roleName.toString();
-    }
-}
+	public Role(ERole name) {
+		this.name = name;
+	}}

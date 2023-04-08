@@ -7,12 +7,8 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
-import java.io.Serializable;
-import java.util.*;
+import java.util.Set;
 
 
 @Entity
@@ -21,8 +17,8 @@ import java.util.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class User implements Serializable , UserDetails {
-
+@Builder
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -39,6 +35,7 @@ public class User implements Serializable , UserDetails {
     private String email;
 
     private String password;
+
     @OneToMany(mappedBy="userOwner")
     private Set<Point> points;
 
@@ -49,41 +46,5 @@ public class User implements Serializable , UserDetails {
     @ManyToMany(mappedBy = "usersWhoLiked")
     Set<Point> likedPoints;
     @ManyToMany(fetch = FetchType.EAGER  , cascade = CascadeType.PERSIST)
-    List <Role> roles;
-
-    private String googleOAuth2Token;
-
-    private String code;
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        this.roles.forEach(role -> authorities.add(new SimpleGrantedAuthority(role.getRoleName())));
-        return authorities;
-    }
-
-    @Override
-    public String getUsername() {
-        return this.email;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
+    Set<Role> roles;
 }
