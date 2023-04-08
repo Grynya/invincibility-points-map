@@ -14,6 +14,7 @@ import com.invincibilitypoints.invincibilitypointsmap.security.security.services
 import com.invincibilitypoints.invincibilitypointsmap.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -39,6 +40,8 @@ public class AuthController {
     private final JwtUtils jwtUtils;
 
     private final RefreshTokenService refreshTokenService;
+
+    @Value("${jwt_expiration_ms}")int jwtExpirationMs;
 
     @Autowired
     public AuthController(AuthenticationManager authenticationManager,
@@ -67,7 +70,8 @@ public class AuthController {
 
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
 
-        return ResponseEntity.ok(new JwtResponse(jwt, refreshToken.getToken(), userDetails.getId(),
+
+        return ResponseEntity.ok(new JwtResponse(jwt, jwtExpirationMs, refreshToken.getToken(), userDetails.getId(),
                 userDetails.getUsername(), userDetails.getEmail(), roles));
     }
 
@@ -79,13 +83,12 @@ public class AuthController {
     @PostMapping("/refreshtoken")
     public ResponseEntity<?> refreshtoken(@Valid @RequestBody TokenRefreshRequest request) {
         String requestRefreshToken = request.getRefreshToken();
-
         return refreshTokenService.findByToken(requestRefreshToken)
                 .map(refreshTokenService::verifyExpiration)
                 .map(RefreshToken::getUser)
                 .map(user -> {
                     String token = jwtUtils.generateTokenFromEmail(user.getEmail());
-                    return ResponseEntity.ok(new TokenRefreshResponse(token, requestRefreshToken));
+                    return ResponseEntity.ok(new TokenRefreshResponse(token, requestRefreshToken, jwtExpirationMs));
                 })
                 .orElseThrow(() -> new TokenRefreshException(requestRefreshToken,
                         "Refresh token is not in database!"));

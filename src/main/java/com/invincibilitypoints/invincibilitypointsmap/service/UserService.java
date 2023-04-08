@@ -1,5 +1,7 @@
 package com.invincibilitypoints.invincibilitypointsmap.service;
 
+import com.invincibilitypoints.invincibilitypointsmap.dto.PointDto;
+import com.invincibilitypoints.invincibilitypointsmap.model.Point;
 import com.invincibilitypoints.invincibilitypointsmap.model.UserStatus;
 import com.invincibilitypoints.invincibilitypointsmap.security.models.ERole;
 import com.invincibilitypoints.invincibilitypointsmap.security.models.Role;
@@ -14,9 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -75,5 +75,17 @@ public class UserService {
         userRepository.save(user);
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
 
+    }
+    public ResponseEntity<?> getPoints(Long id) {
+        Optional<User> user = userRepository.findById(id);
+        if (user.isPresent()){
+            List<PointDto> pointDtos = new ArrayList<>();
+            for (Point point : user.get().getPoints()) {
+                PointDto pointDto = PointDto.fromPoint(point);
+                pointDtos.add(pointDto);
+            }
+            return ResponseEntity.ok().body(pointDtos);
+        }
+        return ResponseEntity.badRequest().body(new MessageResponse("User id is invalid"));
     }
 }

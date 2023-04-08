@@ -6,13 +6,15 @@ import lombok.Setter;
 @Getter
 @Setter
 public class TokenRefreshResponse {
-  private String accessToken;
-  private String refreshToken;
-  private String tokenType = "Bearer";
+    private String accessToken;
+    private String refreshToken;
+    private int expiresIn;
+    private String tokenType = "Bearer";
 
-  public TokenRefreshResponse(String accessToken, String refreshToken) {
-    this.accessToken = accessToken;
-    this.refreshToken = refreshToken;
-  }
+    public TokenRefreshResponse(String accessToken, String refreshToken, int expiresIn) {
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
+        this.expiresIn = expiresIn;
+    }
 
 }

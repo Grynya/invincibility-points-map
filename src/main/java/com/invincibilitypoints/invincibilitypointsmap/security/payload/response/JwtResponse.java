@@ -7,7 +7,8 @@ import java.util.List;
 @Getter
 @Setter
 public class JwtResponse {
-	private String token;
+	private String accessToken;
+    private int expiresIn;
 	private String type = "Bearer";
 	private String refreshToken;
 	private Long id;
@@ -15,8 +16,9 @@ public class JwtResponse {
 	private String email;
 	private List<String> roles;
 
-	public JwtResponse(String accessToken, String refreshToken, Long id, String username, String email, List<String> roles) {
-		this.token = accessToken;
+	public JwtResponse(String accessToken, int expiresIn, String refreshToken, Long id, String username, String email, List<String> roles) {
+		this.accessToken = accessToken;
+        this.expiresIn = expiresIn;
 		this.refreshToken = refreshToken;
 		this.id = id;
 		this.username = username;
