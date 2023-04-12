@@ -24,5 +24,5 @@ public class PointPhoto {
 
     @ManyToOne
     @JoinColumn(name="point_id", nullable=false)
-    private Point point;
+    private MapPoint point;
 }

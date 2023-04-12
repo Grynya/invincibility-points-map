@@ -1,6 +1,6 @@
 package com.invincibilitypoints.invincibilitypointsmap.security.models;
 
-import com.invincibilitypoints.invincibilitypointsmap.model.Point;
+import com.invincibilitypoints.invincibilitypointsmap.model.MapPoint;
 import com.invincibilitypoints.invincibilitypointsmap.model.UserStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -37,14 +37,14 @@ public class User {
     private String password;
 
     @OneToMany(mappedBy="userOwner")
-    private Set<Point> points;
+    private Set<MapPoint> points;
 
     @NotNull
     @Enumerated(EnumType.STRING)
     private UserStatus userStatus = UserStatus.INACTIVE;
 
     @ManyToMany(mappedBy = "usersWhoLiked")
-    Set<Point> likedPoints;
+    Set<MapPoint> likedPoints;
     @ManyToMany(fetch = FetchType.EAGER  , cascade = CascadeType.PERSIST)
     Set<Role> roles;
 }

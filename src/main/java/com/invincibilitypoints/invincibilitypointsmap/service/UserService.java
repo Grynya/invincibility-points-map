@@ -1,7 +1,7 @@
 package com.invincibilitypoints.invincibilitypointsmap.service;
 
-import com.invincibilitypoints.invincibilitypointsmap.dto.PointDto;
-import com.invincibilitypoints.invincibilitypointsmap.model.Point;
+import com.invincibilitypoints.invincibilitypointsmap.dto.MapPointDto;
+import com.invincibilitypoints.invincibilitypointsmap.model.MapPoint;
 import com.invincibilitypoints.invincibilitypointsmap.model.UserStatus;
 import com.invincibilitypoints.invincibilitypointsmap.security.models.ERole;
 import com.invincibilitypoints.invincibilitypointsmap.security.models.Role;
@@ -79,9 +79,9 @@ public class UserService {
     public ResponseEntity<?> getPoints(Long id) {
         Optional<User> user = userRepository.findById(id);
         if (user.isPresent()){
-            List<PointDto> pointDtos = new ArrayList<>();
-            for (Point point : user.get().getPoints()) {
-                PointDto pointDto = PointDto.fromPoint(point);
+            List<MapPointDto> pointDtos = new ArrayList<>();
+            for (MapPoint point : user.get().getPoints()) {
+                MapPointDto pointDto = MapPointDto.fromPoint(point);
                 pointDtos.add(pointDto);
             }
             return ResponseEntity.ok().body(pointDtos);

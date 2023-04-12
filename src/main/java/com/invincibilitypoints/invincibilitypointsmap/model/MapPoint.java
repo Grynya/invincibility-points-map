@@ -4,6 +4,7 @@ import com.invincibilitypoints.invincibilitypointsmap.security.models.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.locationtech.jts.geom.Point;
 
 import java.util.Set;
 
@@ -14,7 +15,8 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table
-public class Point {
+@ToString
+public class MapPoint {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @NotNull
@@ -29,7 +31,9 @@ public class Point {
 
     private String phone;
 
-    private String address;
+    @Column(columnDefinition = "POINT")
+    private Point coordinates;
+
     @OneToMany(mappedBy="point")
     private Set<PointPhoto> photos;
 
@@ -44,6 +48,7 @@ public class Point {
     @JoinTable(
             name = "users_liked_points",
             joinColumns = @JoinColumn(name = "point_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id"))
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
     Set<User> usersWhoLiked;
 }
