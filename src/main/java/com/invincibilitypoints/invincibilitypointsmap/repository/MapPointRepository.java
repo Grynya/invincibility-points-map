@@ -18,7 +18,7 @@ public interface MapPointRepository extends JpaRepository<MapPoint, Long> {
 
     @Query(value = "SELECT * FROM map_point WHERE " +
             "ST_Intersects(coordinates, " +
-            "ST_MakeEnvelope(Point(:swLng, :swLat), Point(:neLng, :neLat)))",
+            "ST_MakeEnvelope(Point(:swLat, :swLng), Point(:neLat, :neLng)))",
             nativeQuery = true)
     List<MapPoint> findByBounds(@Param("swLat") Double swLat, @Param("swLng") Double swLng,
                                 @Param("neLat") Double neLat, @Param("neLng") Double neLng);

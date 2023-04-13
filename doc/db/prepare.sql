@@ -34,9 +34,13 @@ VALUES
     (ST_GeomFromText('POINT(114.109497 22.396428)'), 'Пункт незламності', '08.00-20.00', 22.396428, 'Кафе', '5555-0000', 1);
 
 use invPointMap;
+#
+# INSERT INTO map_point (coordinates, description, hours_of_work, name, phone, user_owner)
+# VALUES(ST_GeomFromText('POINT(48.468416 31.169128)'), 'Пункт незламності', '08.00-20.00', 'Кафе', '5555-0000', 1);
+# lat lng
 
 INSERT INTO map_point (coordinates, description, hours_of_work, name, phone, user_owner)
-VALUES(ST_GeomFromText('POINT(30.421431380596886 48.590126340484375)'), 'Пункт незламності', '08.00-20.00', 'Кафе', '5555-0000', 1);
+VALUES(ST_GeomFromText('POINT(49.96585677169776 33.61018554839228)'), 'Пункт незламності', '08.00-20.00', 'Кафе', '5555-0000', 1);
 
 
 SELECT * FROM map_point WHERE ST_Intersects(coordinates, ST_MakeEnvelope(Point(26.27617956769251, 44.389999999999105), Point(36.24264053591213, 52.36999999999915)))
