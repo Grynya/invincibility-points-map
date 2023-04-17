@@ -18,9 +18,9 @@ public class PointPhoto {
 
     private String fileName;
 
-    private byte[] fileContent;
+    private String contentType;
 
-    private String metadata;
+    private byte[] fileContent;
 
     @ManyToOne
     @JoinColumn(name="point_id", nullable=false)

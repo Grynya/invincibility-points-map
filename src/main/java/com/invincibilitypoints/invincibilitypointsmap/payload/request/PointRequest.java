@@ -1,6 +1,6 @@
 package com.invincibilitypoints.invincibilitypointsmap.payload.request;
 
-import com.invincibilitypoints.invincibilitypointsmap.dto.CoordinateDto;
+import com.invincibilitypoints.invincibilitypointsmap.dto.PointDto;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,9 +11,9 @@ import lombok.ToString;
 @ToString
 public class PointRequest {
     @NotNull
-    private CoordinateDto sw;
+    private PointDto sw;
     @NotNull
-    private CoordinateDto ne;
+    private PointDto ne;
     @NotNull
     private Double zoom;
     private Long userId;

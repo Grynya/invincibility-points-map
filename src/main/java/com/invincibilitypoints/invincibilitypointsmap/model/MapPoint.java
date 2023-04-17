@@ -11,7 +11,7 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Table
@@ -19,7 +19,6 @@ import java.util.Set;
 public class MapPoint {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @NotNull
     private Long id;
 
     @NotNull
@@ -31,7 +30,7 @@ public class MapPoint {
 
     private String phone;
 
-    @Column(columnDefinition = "POINT")
+    @Column(columnDefinition = "POINT", unique = true)
     private Point coordinates;
 
     @OneToMany(mappedBy="point")

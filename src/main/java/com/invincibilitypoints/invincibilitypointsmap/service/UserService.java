@@ -70,7 +70,6 @@ public class UserService {
                 roles.add(userRole);
             });
         }
-
         user.setRoles(roles);
         userRepository.save(user);
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
