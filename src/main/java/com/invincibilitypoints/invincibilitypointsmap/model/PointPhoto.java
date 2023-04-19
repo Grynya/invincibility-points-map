@@ -20,6 +20,7 @@ public class PointPhoto {
 
     private String contentType;
 
+    @Column(length = 100000)
     private byte[] fileContent;
 
     @ManyToOne

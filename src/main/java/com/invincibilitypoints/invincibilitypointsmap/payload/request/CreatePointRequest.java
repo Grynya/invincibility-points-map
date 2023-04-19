@@ -6,8 +6,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.locationtech.jts.geom.Point;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Set;
 
@@ -23,7 +21,6 @@ public class CreatePointRequest {
     private String hoursOfWork;
     @NotNull
     private PointDto coordinates;
-    private MultipartFile[] photos;
     private Set<Resource> resources;
     private Long userId;
 }

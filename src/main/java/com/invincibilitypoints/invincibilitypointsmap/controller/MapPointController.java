@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping
-public class PointController {
+public class MapPointController {
     private final PointService pointService;
 
     @Autowired
-    public PointController(PointService pointService) {
+    public MapPointController(PointService pointService) {
         this.pointService = pointService;
     }
 
