@@ -4,14 +4,15 @@ import com.invincibilitypoints.invincibilitypointsmap.converters.PointConverter;
 import com.invincibilitypoints.invincibilitypointsmap.dto.MapPointDto;
 import com.invincibilitypoints.invincibilitypointsmap.exceptions.BadRequestException;
 import com.invincibilitypoints.invincibilitypointsmap.model.MapPoint;
+import com.invincibilitypoints.invincibilitypointsmap.model.Resource;
 import com.invincibilitypoints.invincibilitypointsmap.payload.request.CreatePointRequest;
 import com.invincibilitypoints.invincibilitypointsmap.payload.request.PointRequest;
+import com.invincibilitypoints.invincibilitypointsmap.payload.response.CreateMapPointResponse;
 import com.invincibilitypoints.invincibilitypointsmap.repository.MapPointRepository;
 import com.invincibilitypoints.invincibilitypointsmap.repository.ResourceRepository;
 import com.invincibilitypoints.invincibilitypointsmap.security.models.User;
 import com.invincibilitypoints.invincibilitypointsmap.security.payload.response.MessageResponse;
 import com.invincibilitypoints.invincibilitypointsmap.security.repository.UserRepository;
-import com.invincibilitypoints.invincibilitypointsmap.util.LocationUriBuilder;
 import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,30 +20,31 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.net.URI;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
-public class PointService {
+public class MapPointService {
     private final MapPointRepository mapPointRepository;
     private final UserRepository userRepository;
     private final ResourceRepository resourceRepository;
 
     @Autowired
-    public PointService(MapPointRepository pointRepository,
-                        UserRepository userRepository,
-                        ResourceRepository resourceRepository) {
+    public MapPointService(MapPointRepository pointRepository,
+                           UserRepository userRepository,
+                           ResourceRepository resourceRepository) {
         this.mapPointRepository = pointRepository;
         this.userRepository = userRepository;
         this.resourceRepository = resourceRepository;
     }
 
-public ResponseEntity<?> filterPointsInBounds(PointRequest pointRequest) {
-    List<MapPoint> points = getPointsInBounds(pointRequest);
-    return ResponseEntity.ok().body(points.stream().map(MapPointDto::fromPoint).toList());
-}
+    public ResponseEntity<?> filterPointsInBounds(PointRequest pointRequest) {
+        List<MapPoint> points = getPointsInBounds(pointRequest);
+        System.out.println(points);
+        return ResponseEntity.ok().body(points.stream().map(MapPointDto::fromPoint).toList());
+    }
 
     private List<MapPoint> getPointsInBounds(PointRequest pointRequest) {
         Long userId = pointRequest.getUserId();
@@ -67,27 +69,37 @@ public ResponseEntity<?> filterPointsInBounds(PointRequest pointRequest) {
 
     @Transactional
     public ResponseEntity<?> createPoint(CreatePointRequest createPointRequest) {
-            Long userId = createPointRequest.getUserId();
-            Optional<User> user = userRepository.findById(userId);
-            if (user.isEmpty()) {
-                return ResponseEntity.badRequest().body(new MessageResponse("User id is invalid"));
+        Long userId = createPointRequest.getUserId();
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isEmpty()) {
+            return ResponseEntity.badRequest().body(new MessageResponse("User id is invalid"));
+        }
+
+        Point coordinates = PointConverter.toPoint(createPointRequest.getCoordinates());
+
+        if (mapPointRepository.existsMapPointByCoordinates(coordinates)) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(new MessageResponse("Point with the same coordinates already exists"));
+        }
+
+        MapPoint mapPoint = buildMapPoint(createPointRequest, user.get(), coordinates);
+
+        // Connect the resources to the map point
+        Set<Resource> resources = new HashSet<>();
+        for (Resource resource : createPointRequest.getResources()) {
+            Optional<Resource> savedResource = resourceRepository.findById(resource.getId());
+            if (savedResource.isPresent()) {
+                savedResource.get().getPoints().add(mapPoint);
+                resources.add(resource);
             }
+        }
+        System.out.println(resources);
 
-            createPointRequest.getResources().removeIf(resource -> !resourceRepository.existsById(resource.getId()));
+        mapPoint.setResources(resources);
 
-            Point coordinates = PointConverter.toPoint(createPointRequest.getCoordinates());
+        MapPoint mapPointCreated = mapPointRepository.save(mapPoint);
 
-            if (mapPointRepository.existsMapPointByCoordinates(coordinates)) {
-                return ResponseEntity.status(HttpStatus.CONFLICT)
-                        .body(new MessageResponse("Point with the same coordinates already exists"));
-            }
-
-            MapPoint mapPoint = buildMapPoint(createPointRequest, user.get(), coordinates);
-
-            MapPoint mapPointCreated = mapPointRepository.save(mapPoint);
-            URI location = LocationUriBuilder.build(mapPointCreated.getId());
-
-            return ResponseEntity.created(location).build();
+        return ResponseEntity.ok().body(new CreateMapPointResponse(mapPointCreated.getId()));
     }
 
     private MapPoint buildMapPoint(CreatePointRequest createPointRequest, User user, Point coordinates) {
@@ -98,7 +110,6 @@ public ResponseEntity<?> filterPointsInBounds(PointRequest pointRequest) {
                 .hoursOfWork(createPointRequest.getHoursOfWork())
                 .coordinates(coordinates)
                 .usersWhoLiked(new HashSet<>())
-                .resources(createPointRequest.getResources())
                 .userOwner(user)
                 .build();
     }

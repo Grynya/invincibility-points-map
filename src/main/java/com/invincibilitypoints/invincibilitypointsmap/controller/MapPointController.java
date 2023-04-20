@@ -2,7 +2,7 @@ package com.invincibilitypoints.invincibilitypointsmap.controller;
 
 import com.invincibilitypoints.invincibilitypointsmap.payload.request.CreatePointRequest;
 import com.invincibilitypoints.invincibilitypointsmap.payload.request.PointRequest;
-import com.invincibilitypoints.invincibilitypointsmap.service.PointService;
+import com.invincibilitypoints.invincibilitypointsmap.service.MapPointService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping
 public class MapPointController {
-    private final PointService pointService;
+    private final MapPointService pointService;
 
     @Autowired
-    public MapPointController(PointService pointService) {
+    public MapPointController(MapPointService pointService) {
         this.pointService = pointService;
     }
 
