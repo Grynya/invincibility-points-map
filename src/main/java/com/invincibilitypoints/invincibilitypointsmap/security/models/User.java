@@ -45,6 +45,6 @@ public class User {
 
     @ManyToMany(mappedBy = "usersWhoLiked")
     Set<MapPoint> likedPoints;
-    @ManyToMany(fetch = FetchType.EAGER  , cascade = CascadeType.PERSIST)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     Set<Role> roles;
 }

@@ -1,13 +1,11 @@
 package com.invincibilitypoints.invincibilitypointsmap.security.controllers;
 
-import com.invincibilitypoints.invincibilitypointsmap.security.exception.TokenRefreshException;
 import com.invincibilitypoints.invincibilitypointsmap.security.models.RefreshToken;
 import com.invincibilitypoints.invincibilitypointsmap.security.payload.request.LoginRequest;
 import com.invincibilitypoints.invincibilitypointsmap.security.payload.request.SignupRequest;
 import com.invincibilitypoints.invincibilitypointsmap.security.payload.request.TokenRefreshRequest;
 import com.invincibilitypoints.invincibilitypointsmap.security.payload.response.JwtResponse;
 import com.invincibilitypoints.invincibilitypointsmap.security.payload.response.MessageResponse;
-import com.invincibilitypoints.invincibilitypointsmap.security.payload.response.TokenRefreshResponse;
 import com.invincibilitypoints.invincibilitypointsmap.security.security.jwt.JwtUtils;
 import com.invincibilitypoints.invincibilitypointsmap.security.security.services.RefreshTokenService;
 import com.invincibilitypoints.invincibilitypointsmap.security.security.services.UserDetailsImpl;
@@ -83,20 +81,8 @@ public class AuthController {
     }
 
     @PostMapping("/refreshtoken")
-    public ResponseEntity<?> refreshtoken(@Valid @RequestBody TokenRefreshRequest request) {
-        String requestRefreshToken = request.getRefreshToken();
-        log.info("request to refresh token: "+request);
-        log.info("refresh token: "+requestRefreshToken);
-        return refreshTokenService.findByToken(requestRefreshToken)
-                .map(refreshTokenService::verifyExpiration)
-                .map(RefreshToken::getUser)
-                .map(user -> {
-                    String token = jwtUtils.generateTokenFromEmail(user.getEmail());
-                    RefreshToken updatedRefreshToken = refreshTokenService.createRefreshToken(user.getId());
-                    return ResponseEntity.ok(new TokenRefreshResponse(token, updatedRefreshToken.getToken(), jwtExpirationMs));
-                })
-                .orElseThrow(() -> new TokenRefreshException(requestRefreshToken,
-                        "Refresh token is not in database!"));
+    public ResponseEntity<?> refreshToken(@Valid @RequestBody TokenRefreshRequest request) {
+        return refreshTokenService.refreshToken(request);
     }
 
     @PostMapping("/signout")

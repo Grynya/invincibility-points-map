@@ -6,10 +6,14 @@ import java.util.UUID;
 
 import com.invincibilitypoints.invincibilitypointsmap.security.exception.TokenRefreshException;
 import com.invincibilitypoints.invincibilitypointsmap.security.models.RefreshToken;
+import com.invincibilitypoints.invincibilitypointsmap.security.payload.request.TokenRefreshRequest;
+import com.invincibilitypoints.invincibilitypointsmap.security.payload.response.TokenRefreshResponse;
 import com.invincibilitypoints.invincibilitypointsmap.security.repository.RefreshTokenRepository;
 import com.invincibilitypoints.invincibilitypointsmap.security.repository.UserRepository;
+import com.invincibilitypoints.invincibilitypointsmap.security.security.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +27,11 @@ public class RefreshTokenService {
     private RefreshTokenRepository refreshTokenRepository;
 
     @Autowired
+    private JwtUtils jwtUtils;
+    @Autowired
     private UserRepository userRepository;
+
+    @Value("${jwt_expiration_ms}")int jwtExpirationMs;
 
     public Optional<RefreshToken> findByToken(String token) {
         return refreshTokenRepository.findByToken(token);
@@ -40,6 +48,20 @@ public class RefreshTokenService {
 
         refreshToken = refreshTokenRepository.save(refreshToken);
         return refreshToken;
+    }
+    public ResponseEntity<?> refreshToken(TokenRefreshRequest request) {
+        String requestRefreshToken = request.getRefreshToken();
+        return findByToken(requestRefreshToken)
+                .map(this::verifyExpiration)
+                .map(RefreshToken::getUser)
+                .map(user -> {
+                    String token = jwtUtils.generateTokenFromEmail(user.getEmail());
+                    RefreshToken updatedRefreshToken = createRefreshToken(user.getId());
+                    return ResponseEntity
+                            .ok(new TokenRefreshResponse(token, updatedRefreshToken.getToken(), jwtExpirationMs));
+                })
+                .orElseThrow(() -> new TokenRefreshException(requestRefreshToken,
+                        "Refresh token is not in database!"));
     }
 
     public RefreshToken verifyExpiration(RefreshToken token) {
