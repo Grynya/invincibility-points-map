@@ -42,7 +42,6 @@ public class MapPointService {
 
     public ResponseEntity<?> filterPointsInBounds(PointRequest pointRequest) {
         List<MapPoint> points = getPointsInBounds(pointRequest);
-        System.out.println(points);
         return ResponseEntity.ok().body(points.stream().map(MapPointDto::fromPoint).toList());
     }
 
@@ -93,8 +92,6 @@ public class MapPointService {
                 resources.add(resource);
             }
         }
-        System.out.println(resources);
-
         mapPoint.setResources(resources);
 
         MapPoint mapPointCreated = mapPointRepository.save(mapPoint);

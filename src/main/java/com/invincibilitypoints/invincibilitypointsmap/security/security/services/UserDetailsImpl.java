@@ -1,6 +1,7 @@
 package com.invincibilitypoints.invincibilitypointsmap.security.security.services;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.invincibilitypoints.invincibilitypointsmap.enums.EStatus;
 import com.invincibilitypoints.invincibilitypointsmap.security.models.User;
 import lombok.Builder;
 import lombok.Getter;
@@ -28,6 +29,8 @@ public class UserDetailsImpl implements UserDetails {
 
     private String email;
 
+    private EStatus userStatus;
+
 	@JsonIgnore
 	private String password;
 
@@ -43,6 +46,7 @@ public class UserDetailsImpl implements UserDetails {
                 user.getName(),
                 user.getSurname(),
                 user.getEmail(),
+                user.getUserStatus(),
                 user.getPassword(),
                 authorities);
     }

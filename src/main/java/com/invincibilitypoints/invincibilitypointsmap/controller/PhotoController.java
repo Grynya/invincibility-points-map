@@ -9,8 +9,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Arrays;
-
 
 @RestController
 @RequestMapping("photo")
@@ -24,7 +22,6 @@ public class PhotoController {
     @PostMapping("/createAll")
     public ResponseEntity<?> createPhotos(@RequestParam("mapPointId") Long mapPointId,
                                           @RequestParam("photos") MultipartFile[] photos) {
-        System.out.println(Arrays.toString(photos));
         return photoService.createPhotos(photos, mapPointId);
     }
 }
