@@ -62,7 +62,7 @@ public class UserDetailsImpl implements UserDetails {
 
 	@Override
 	public String getUsername() {
-		return name;
+		return email;
 	}
 
 	@Override

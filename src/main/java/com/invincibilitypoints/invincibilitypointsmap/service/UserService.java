@@ -2,6 +2,7 @@ package com.invincibilitypoints.invincibilitypointsmap.service;
 
 import com.invincibilitypoints.invincibilitypointsmap.dto.ErrorResponse;
 import com.invincibilitypoints.invincibilitypointsmap.dto.MapPointDto;
+import com.invincibilitypoints.invincibilitypointsmap.dto.UserDto;
 import com.invincibilitypoints.invincibilitypointsmap.enums.ERole;
 import com.invincibilitypoints.invincibilitypointsmap.enums.ETokenVerificationStatus;
 import com.invincibilitypoints.invincibilitypointsmap.events.OnRegistrationCompleteEvent;
@@ -19,6 +20,7 @@ import com.invincibilitypoints.invincibilitypointsmap.security.repository.Verifi
 import com.invincibilitypoints.invincibilitypointsmap.security.security.jwt.JwtUtils;
 import com.invincibilitypoints.invincibilitypointsmap.security.security.services.RefreshTokenService;
 import com.invincibilitypoints.invincibilitypointsmap.security.security.services.UserDetailsImpl;
+import com.invincibilitypoints.invincibilitypointsmap.security.security.services.UserDetailsServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,6 +49,7 @@ public class UserService {
     private final ApplicationEventPublisher eventPublisher;
     private final VerificationTokenRepository verificationTokenRepository;
     private final RefreshTokenService refreshTokenService;
+
     @Value("${jwt_expiration_ms}")
     int jwtExpirationMs;
 
@@ -96,7 +99,7 @@ public class UserService {
 
     public JwtResponse generateTokens(User user) {
 
-        String jwt = jwtUtils.generateJwtToken(UserDetailsImpl.build(user));
+        String jwt = jwtUtils.generateTokenFromEmail(user.getEmail());
 
         List<String> roles = user
                 .getRoles()
@@ -186,5 +189,14 @@ public class UserService {
             return new TokenVerificationResponse(ETokenVerificationStatus.TOKEN_VALID, responseEntity);
         }
         return new TokenVerificationResponse(ETokenVerificationStatus.TOKEN_INVALID, null);
+    }
+
+    public ResponseEntity<?> getUserInfoByAccessToken(String accessToken) {
+        String username = jwtUtils.getEmailFromJwtToken(accessToken);
+        Optional<User> user = userRepository.findByEmail(username);
+        if (user.isEmpty())
+            return ResponseEntity.badRequest().body(new MessageResponse("User id is invalid"));
+        return ResponseEntity.ok(new UserDto(user.get().getName(), user.get().getSurname(),
+                user.get().getEmail(), user.get().getUserStatus(), false));
     }
 }

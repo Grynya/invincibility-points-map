@@ -53,13 +53,13 @@ public class AuthController {
         if (result.eTokenVerificationStatus().equals(ETokenVerificationStatus.TOKEN_VALID)) {
             return new RedirectView( url + "/successVerification" +
                     "?accessToken=" + result.jwtResponse().getAccessToken()+
-//                    "&refreshToken=" + result.jwtResponse().getRefreshToken()+
-                    "&expiresIn=" + result.jwtResponse().getExpiresIn()+
-                    "&id=" + result.jwtResponse().getId()+
-                    "&name=" + result.jwtResponse().getName()+
-                    "&surname=" + result.jwtResponse().getSurname()+
-                    "&email=" + result.jwtResponse().getEmail()+
-                    "&tokenType=" + result.jwtResponse().getTokenType());
+                    "&refreshToken=" + result.jwtResponse().getRefreshToken()+
+                    "&expiresIn=" + result.jwtResponse().getExpiresIn());
+//                    "&id=" + result.jwtResponse().getId()+
+//                    "&name=" + result.jwtResponse().getName()+
+//                    "&surname=" + result.jwtResponse().getSurname()+
+//                    "&email=" + result.jwtResponse().getEmail()+
+//                    "&tokenType=" + result.jwtResponse().getTokenType())
         }
         return new RedirectView(url + "/errorVerification?errorMessage=" + result.eTokenVerificationStatus());
     }
