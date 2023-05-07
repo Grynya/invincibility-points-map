@@ -1,9 +1,5 @@
 package com.invincibilitypoints.invincibilitypointsmap.security.security.services;
 
-import java.time.Instant;
-import java.util.Optional;
-import java.util.UUID;
-
 import com.invincibilitypoints.invincibilitypointsmap.security.exception.TokenRefreshException;
 import com.invincibilitypoints.invincibilitypointsmap.security.models.RefreshToken;
 import com.invincibilitypoints.invincibilitypointsmap.security.payload.request.TokenRefreshRequest;
@@ -16,6 +12,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Instant;
+import java.util.Optional;
+import java.util.UUID;
 
 
 @Service
@@ -64,12 +64,12 @@ public class RefreshTokenService {
                         "Refresh token is not in database!"));
     }
 
+
     public RefreshToken verifyExpiration(RefreshToken token) {
         if (token.getExpiryDate().compareTo(Instant.now()) < 0) {
             refreshTokenRepository.delete(token);
             throw new TokenRefreshException(token.getToken(), "Refresh token was expired. Please make a new signin request");
         }
-
         return token;
     }
 

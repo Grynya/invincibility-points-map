@@ -55,11 +55,6 @@ public class AuthController {
                     "?accessToken=" + result.jwtResponse().getAccessToken()+
                     "&refreshToken=" + result.jwtResponse().getRefreshToken()+
                     "&expiresIn=" + result.jwtResponse().getExpiresIn());
-//                    "&id=" + result.jwtResponse().getId()+
-//                    "&name=" + result.jwtResponse().getName()+
-//                    "&surname=" + result.jwtResponse().getSurname()+
-//                    "&email=" + result.jwtResponse().getEmail()+
-//                    "&tokenType=" + result.jwtResponse().getTokenType())
         }
         return new RedirectView(url + "/errorVerification?errorMessage=" + result.eTokenVerificationStatus());
     }
@@ -70,7 +65,11 @@ public class AuthController {
     @PostMapping("/signout")
     public ResponseEntity<?> logoutUser() {
         try {
-            UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder
+                    .getContext()
+                    .getAuthentication()
+                    .getPrincipal();
+            System.out.println(userDetails);
             Long userId = userDetails.getId();
             refreshTokenService.deleteByUserId(userId);
             return ResponseEntity.ok(new MessageResponse("Log out successful!"));

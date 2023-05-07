@@ -115,7 +115,8 @@ public class UserService {
         return new JwtResponse(jwt, jwtExpirationMs, refreshToken.getToken(), user.getId(),
                 user.getEmail(), user.getSurname(), user.getEmail(), containsAdminRole(roles));
     }
-    private boolean containsAdminRole(List<String> roles){
+
+    private boolean containsAdminRole(List<String> roles) {
         return roles.contains(ERole.ROLE_ADMIN.name());
     }
 
@@ -185,7 +186,7 @@ public class UserService {
             }
 
             user.setUserStatus(EStatus.ACTIVE);
-//            verificationTokenRepository.delete(verificationToken);
+            verificationTokenRepository.delete(verificationToken);
             userRepository.save(user);
             JwtResponse responseEntity = generateTokens(user);
             return new TokenVerificationResponse(ETokenVerificationStatus.TOKEN_VALID, responseEntity);
@@ -200,5 +201,12 @@ public class UserService {
             return ResponseEntity.badRequest().body(new MessageResponse("User id is invalid"));
         return ResponseEntity.ok(new UserDto(user.get().getId(), user.get().getName(), user.get().getSurname(),
                 user.get().getEmail(), user.get().getUserStatus(), false));
+    }
+
+    public ResponseEntity<?> getLikedPoints(Long userId) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        return (optionalUser.isPresent()) ?
+                ResponseEntity.ok(optionalUser.get().getLikedPoints()) :
+                ResponseEntity.badRequest().body(new MessageResponse("User id is invalid"));
     }
 }
