@@ -206,7 +206,7 @@ public class UserService {
     public ResponseEntity<?> getLikedPoints(Long userId) {
         Optional<User> optionalUser = userRepository.findById(userId);
         return (optionalUser.isPresent()) ?
-                ResponseEntity.ok(optionalUser.get().getLikedPoints()) :
+                ResponseEntity.ok(optionalUser.get().getLikedPoints().stream().map(MapPointDto::fromPoint).toList()) :
                 ResponseEntity.badRequest().body(new MessageResponse("User id is invalid"));
     }
 }
