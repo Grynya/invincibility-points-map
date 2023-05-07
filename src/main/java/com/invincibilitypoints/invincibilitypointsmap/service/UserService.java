@@ -4,12 +4,15 @@ import com.invincibilitypoints.invincibilitypointsmap.dto.ErrorResponse;
 import com.invincibilitypoints.invincibilitypointsmap.dto.MapPointDto;
 import com.invincibilitypoints.invincibilitypointsmap.dto.UserDto;
 import com.invincibilitypoints.invincibilitypointsmap.enums.ERole;
+import com.invincibilitypoints.invincibilitypointsmap.enums.EStatus;
 import com.invincibilitypoints.invincibilitypointsmap.enums.ETokenVerificationStatus;
 import com.invincibilitypoints.invincibilitypointsmap.events.OnRegistrationCompleteEvent;
-import com.invincibilitypoints.invincibilitypointsmap.enums.EStatus;
 import com.invincibilitypoints.invincibilitypointsmap.model.MapPoint;
 import com.invincibilitypoints.invincibilitypointsmap.payload.response.TokenVerificationResponse;
-import com.invincibilitypoints.invincibilitypointsmap.security.models.*;
+import com.invincibilitypoints.invincibilitypointsmap.security.models.RefreshToken;
+import com.invincibilitypoints.invincibilitypointsmap.security.models.Role;
+import com.invincibilitypoints.invincibilitypointsmap.security.models.User;
+import com.invincibilitypoints.invincibilitypointsmap.security.models.VerificationToken;
 import com.invincibilitypoints.invincibilitypointsmap.security.payload.request.LoginRequest;
 import com.invincibilitypoints.invincibilitypointsmap.security.payload.request.SignupRequest;
 import com.invincibilitypoints.invincibilitypointsmap.security.payload.response.JwtResponse;
@@ -20,7 +23,6 @@ import com.invincibilitypoints.invincibilitypointsmap.security.repository.Verifi
 import com.invincibilitypoints.invincibilitypointsmap.security.security.jwt.JwtUtils;
 import com.invincibilitypoints.invincibilitypointsmap.security.security.services.RefreshTokenService;
 import com.invincibilitypoints.invincibilitypointsmap.security.security.services.UserDetailsImpl;
-import com.invincibilitypoints.invincibilitypointsmap.security.security.services.UserDetailsServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -196,7 +198,7 @@ public class UserService {
         Optional<User> user = userRepository.findByEmail(username);
         if (user.isEmpty())
             return ResponseEntity.badRequest().body(new MessageResponse("User id is invalid"));
-        return ResponseEntity.ok(new UserDto(user.get().getName(), user.get().getSurname(),
+        return ResponseEntity.ok(new UserDto(user.get().getId(), user.get().getName(), user.get().getSurname(),
                 user.get().getEmail(), user.get().getUserStatus(), false));
     }
 }

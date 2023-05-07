@@ -119,4 +119,61 @@ public class MapPointService {
         } else return ResponseEntity.notFound().build();
     }
 
+    public ResponseEntity<?> likePoint(Long pointId, Long userId) {
+        Optional<MapPoint> pointOptional = mapPointRepository.findById(pointId);
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty())
+            return ResponseEntity.badRequest().body(new MessageResponse("User id is invalid"));
+        else if (pointOptional.isEmpty())
+            return ResponseEntity.badRequest().body(new MessageResponse("Point id is invalid"));
+        else {
+            Set<MapPoint> likedPoints = userOptional.get().getLikedPoints();
+            Set<User> usersWhoLiked = pointOptional.get().getUsersWhoLiked();
+
+            likedPoints.add(pointOptional.get());
+            usersWhoLiked.add(userOptional.get());
+
+            mapPointRepository.save(pointOptional.get());
+            userRepository.save(userOptional.get());
+
+            return ResponseEntity.ok().build();
+        }
+    }
+
+    public ResponseEntity<?> unlikePoint(Long pointId, Long userId) {
+        Optional<MapPoint> pointOptional = mapPointRepository.findById(pointId);
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty())
+            return ResponseEntity.badRequest().body(new MessageResponse("User id is invalid"));
+        else if (pointOptional.isEmpty())
+            return ResponseEntity.badRequest().body(new MessageResponse("Point id is invalid"));
+        else {
+            Set<MapPoint> likedPoints = userOptional.get().getLikedPoints();
+            Set<User> usersWhoLiked = pointOptional.get().getUsersWhoLiked();
+
+            likedPoints.remove(pointOptional.get());
+            usersWhoLiked.remove(userOptional.get());
+
+            mapPointRepository.save(pointOptional.get());
+            userRepository.save(userOptional.get());
+
+            return ResponseEntity.ok().build();
+        }
+    }
+
+    public ResponseEntity<?> isLikedPoint(Long pointId, Long userId) {
+        Optional<MapPoint> pointOptional = mapPointRepository.findById(pointId);
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty())
+            return ResponseEntity.badRequest().body(new MessageResponse("User id is invalid"));
+        else if (pointOptional.isEmpty())
+            return ResponseEntity.badRequest().body(new MessageResponse("Point id is invalid"));
+        else {
+            Set<MapPoint> likedPoints = userOptional.get().getLikedPoints();
+            Set<User> usersWhoLiked = pointOptional.get().getUsersWhoLiked();
+            boolean result = likedPoints.remove(pointOptional.get()) && usersWhoLiked.contains(userOptional.get());
+
+            return ResponseEntity.ok().body(result);
+        }
+    }
 }

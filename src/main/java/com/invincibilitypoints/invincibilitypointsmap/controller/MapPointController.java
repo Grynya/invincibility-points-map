@@ -23,7 +23,6 @@ public class MapPointController {
     public ResponseEntity<?> getMapPointById(@Valid @PathVariable Long mapPointId) {
         return pointService.getMapPointById(mapPointId);
     }
-
     @PostMapping("/public/point/getAll")
     public ResponseEntity<?> getPoints(@Valid @RequestBody PointRequest pointRequest) {
         return pointService.filterPointsInBounds(pointRequest);
@@ -31,5 +30,18 @@ public class MapPointController {
     @PostMapping("/point")
     public ResponseEntity<?> createPoint(@Valid @RequestBody CreatePointRequest createPointRequest) {
         return pointService.createPoint(createPointRequest);
+    }
+    @GetMapping("/point/like")
+    public ResponseEntity<?> likePoint(@Valid @RequestParam Long pointId, @Valid @RequestParam Long userId) {
+        return pointService.likePoint(pointId, userId);
+    }
+    @GetMapping("/point/unlike")
+    public ResponseEntity<?> unlikePoint(@Valid @RequestParam Long pointId, @Valid @RequestParam Long userId) {
+        return pointService.unlikePoint(pointId, userId);
+    }
+
+    @GetMapping("/point/isLiked")
+    public ResponseEntity<?> isLikedPoint(@Valid @RequestParam Long pointId, @Valid @RequestParam Long userId) {
+        return pointService.isLikedPoint(pointId, userId);
     }
 }
