@@ -6,6 +6,7 @@ import com.invincibilitypoints.invincibilitypointsmap.dto.UserDto;
 import com.invincibilitypoints.invincibilitypointsmap.enums.ERole;
 import com.invincibilitypoints.invincibilitypointsmap.enums.EStatus;
 import com.invincibilitypoints.invincibilitypointsmap.enums.ETokenVerificationStatus;
+import com.invincibilitypoints.invincibilitypointsmap.events.OnPasswordRecoveryEvent;
 import com.invincibilitypoints.invincibilitypointsmap.events.OnRegistrationCompleteEvent;
 import com.invincibilitypoints.invincibilitypointsmap.model.MapPoint;
 import com.invincibilitypoints.invincibilitypointsmap.payload.response.TokenVerificationResponse;
@@ -208,5 +209,63 @@ public class UserService {
         return (optionalUser.isPresent()) ?
                 ResponseEntity.ok(optionalUser.get().getLikedPoints().stream().map(MapPointDto::fromPoint).toList()) :
                 ResponseEntity.badRequest().body(new MessageResponse("User id is invalid"));
+    }
+
+    public ResponseEntity<?> sendEmailPasswordRecovery(String userEmail, HttpServletRequest request) {
+        Optional<User> optionalUser = userRepository.findByEmail(userEmail);
+        if (optionalUser.isEmpty()) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Не коректна електронна адреса"));
+        }
+        String appUrl = request.getContextPath();
+        System.out.println("service");
+        eventPublisher.publishEvent(new OnPasswordRecoveryEvent(optionalUser.get(),
+                request.getLocale(), appUrl));
+        return ResponseEntity.ok().build();
+
+    }
+
+    public ResponseEntity<?> checkCodePasswordRecovery(String userEmail, String code) {
+        Optional<User> optionalUser = userRepository.findByEmail(userEmail);
+        if (optionalUser.isEmpty()) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Не коректна електронна адреса"));
+        }
+        try {
+            return ResponseEntity.ok().body(isValidCode(optionalUser.get(), code));
+        } catch (NumberFormatException e) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Не правильно введений код. Код повинен бути 6-значним числом"));
+        }
+    }
+
+    public ResponseEntity<?> updatePasswordRecovery(String userEmail, String code, String password) {
+        Optional<User> optionalUser = userRepository.findByEmail(userEmail);
+        System.out.println(userEmail);
+        System.out.println(code);
+        System.out.println(password);
+
+        if (optionalUser.isPresent()) {
+            try {
+                User user = optionalUser.get();
+                if (isValidCode(user, code)) {
+                    user.setPassword(encoder.encode(password));
+                    user.setCode(null);
+                    userRepository.save(user);
+                    return ResponseEntity.ok().body("Пароль змінено");
+                } else {
+                    return ResponseEntity.badRequest().body(new MessageResponse("Не правильно введений код. Код повинен бути 6-значним числом"));
+                }
+            } catch (NumberFormatException e) {
+                return ResponseEntity.badRequest().body(new MessageResponse("Не правильно введений код. Код повинен бути 6-значним числом"));
+            }
+        } else {
+            return ResponseEntity.badRequest().body(new MessageResponse("Не коректна електронна адреса"));
+        }
+    }
+
+    private boolean isValidCode(User user, String code){
+        int parsedCode = Integer.parseInt(code);
+        if (code.length() != 6) {
+            throw new NumberFormatException();
+        }
+        return user.getCode().equals(parsedCode);
     }
 }

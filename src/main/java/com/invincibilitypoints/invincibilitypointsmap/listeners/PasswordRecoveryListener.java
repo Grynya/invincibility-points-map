@@ -1,8 +1,8 @@
 package com.invincibilitypoints.invincibilitypointsmap.listeners;
 
-import com.invincibilitypoints.invincibilitypointsmap.events.OnRegistrationCompleteEvent;
+import com.invincibilitypoints.invincibilitypointsmap.events.OnPasswordRecoveryEvent;
 import com.invincibilitypoints.invincibilitypointsmap.security.models.User;
-import com.invincibilitypoints.invincibilitypointsmap.service.UserService;
+import com.invincibilitypoints.invincibilitypointsmap.security.repository.UserRepository;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,46 +16,42 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.UUID;
+import java.util.Random;
 
 @Component
-public class RegistrationListener implements
-        ApplicationListener<OnRegistrationCompleteEvent> {
-
-    private final UserService userService;
+public class PasswordRecoveryListener implements
+        ApplicationListener<OnPasswordRecoveryEvent> {
 
     private final JavaMailSender mailSender;
 
+    private final UserRepository userRepository;
+
     @Autowired
-    public RegistrationListener(UserService userService, JavaMailSender mailSender) {
-        this.userService = userService;
+    public PasswordRecoveryListener(JavaMailSender mailSender, UserRepository userRepository) {
         this.mailSender = mailSender;
+        this.userRepository = userRepository;
     }
 
     @Override
-    public void onApplicationEvent(OnRegistrationCompleteEvent event) {
+    public void onApplicationEvent(OnPasswordRecoveryEvent event) {
         try {
-            this.confirmRegistration(event);
+            this.confirmPasswordRecovery(event);
         } catch (MessagingException | IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void confirmRegistration(OnRegistrationCompleteEvent event) throws MessagingException, IOException {
+    private void confirmPasswordRecovery(OnPasswordRecoveryEvent event) throws MessagingException, IOException {
         User user = event.getUser();
-        String token = UUID.randomUUID().toString();
-        userService.createVerificationToken(user, token);
-
         String recipientAddress = user.getEmail();
         String subject = "Мапа пунктів незламності";
+        int code = generateCode();
 
-
-        String confirmationUrl = event.getAppUrl() + "/registrationConfirm?token=" + token;
-
-        String message = "<div style=\"background-color: #f0f0f0; padding: 20px; border-radius: 5px;\">"
+        String message =
+                "<div style=\"background-color: #f0f0f0; padding: 20px; border-radius: 5px;\">"
                 + "<h1>Підтвердіть свою електронну адресу</h1>"
-                + "<p>Для підтвердження своєї електронної адреси пошти перейдіть за посиланням. Посилання буде дійсне протягом 1 години</p>"
-                + "<a href=\"http://localhost:8080/api/auth" + confirmationUrl + "\" style=\"background-color: #008CBA; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none;\">Підтвердити</a>"
+                + "<p>Код для підтвердження зміни паролю:</p>"
+                + "<h1>"+code+"</h1>"
                 + "</div>";
 
         MimeMessage email = mailSender.createMimeMessage();
@@ -63,6 +59,9 @@ public class RegistrationListener implements
         InputStreamSource logoInputStreamSource = new ByteArrayResource(Files
                 .readAllBytes(Paths.get("D:\\Idea Projects\\invincibility-points-map\\src\\main\\java\\com\\invincibilitypoints\\invincibilitypointsmap\\listeners\\img\\logo.png")));
         helper.addAttachment("logo.png", logoInputStreamSource, "image/svg+xml");
+
+        user.setCode(code);
+        userRepository.save(user);
         try {
             helper.setTo(recipientAddress);
             helper.setSubject(subject);
@@ -73,4 +72,9 @@ public class RegistrationListener implements
         mailSender.send(email);
     }
 
+    private int generateCode() {
+        int min = 100000;
+        int max = 999999;
+        return new Random().nextInt(max - min + 1) + min;
+    }
 }
