@@ -21,7 +21,7 @@ import org.springframework.web.servlet.view.RedirectView;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/public")
 public class AuthController {
     private final UserService userService;
 
@@ -62,20 +62,24 @@ public class AuthController {
     public ResponseEntity<?> refreshToken(@Valid @RequestBody TokenRefreshRequest request) {
         return refreshTokenService.refreshToken(request);
     }
-    @PostMapping("/signout")
-    public ResponseEntity<?> logoutUser() {
-        try {
-            UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder
-                    .getContext()
-                    .getAuthentication()
-                    .getPrincipal();
-            System.out.println(userDetails);
-            Long userId = userDetails.getId();
-            refreshTokenService.deleteByUserId(userId);
-            return ResponseEntity.ok(new MessageResponse("Log out successful!"));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new MessageResponse(e.getMessage()));
-        }
+
+    @GetMapping("/passwordRecovery/sendEmail")
+    public ResponseEntity<?> sendEmailPasswordRecovery(@Valid @RequestParam String userEmail,
+                                                       HttpServletRequest request) {
+        return userService.sendEmailPasswordRecovery(userEmail, request);
+    }
+
+    @GetMapping("/passwordRecovery/checkCode")
+    public ResponseEntity<?> checkCodePasswordRecovery(@Valid @RequestParam String userEmail,
+                                                       @Valid @RequestParam String code) {
+        return userService.checkCodePasswordRecovery(userEmail, code);
+    }
+
+    @GetMapping("/passwordRecovery/update")
+    public ResponseEntity<?> updatePasswordRecovery(@Valid @RequestParam String userEmail,
+                                                    @Valid @RequestParam String code,
+                                                    @Valid @RequestParam String password) {
+        return userService.updatePasswordRecovery(userEmail, code, password);
     }
 
 }

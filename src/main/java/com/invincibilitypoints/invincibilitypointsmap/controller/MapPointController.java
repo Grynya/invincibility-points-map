@@ -2,6 +2,7 @@ package com.invincibilitypoints.invincibilitypointsmap.controller;
 
 import com.invincibilitypoints.invincibilitypointsmap.payload.request.CreatePointRequest;
 import com.invincibilitypoints.invincibilitypointsmap.payload.request.PointRequest;
+import com.invincibilitypoints.invincibilitypointsmap.payload.request.RatePointRequest;
 import com.invincibilitypoints.invincibilitypointsmap.service.MapPointService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,17 +32,12 @@ public class MapPointController {
     public ResponseEntity<?> createPoint(@Valid @RequestBody CreatePointRequest createPointRequest) {
         return pointService.createPoint(createPointRequest);
     }
-    @GetMapping("/point/like")
-    public ResponseEntity<?> likePoint(@Valid @RequestParam Long pointId, @Valid @RequestParam Long userId) {
-        return pointService.likePoint(pointId, userId);
+    @PostMapping("/point/rate")
+    public ResponseEntity<?> likePoint(@Valid @RequestBody RatePointRequest ratePointRequest) {
+        return pointService.ratePoint(ratePointRequest);
     }
-    @GetMapping("/point/unlike")
-    public ResponseEntity<?> unlikePoint(@Valid @RequestParam Long pointId, @Valid @RequestParam Long userId) {
-        return pointService.unlikePoint(pointId, userId);
-    }
-
-    @GetMapping("/point/isLiked")
-    public ResponseEntity<?> isLikedPoint(@Valid @RequestParam Long pointId, @Valid @RequestParam Long userId) {
-        return pointService.isLikedPoint(pointId, userId);
+    @GetMapping("/point/getRating")
+    public ResponseEntity<?> getRatingOfPoint(@Valid @RequestParam Long pointId, @Valid @RequestParam Long userId) {
+        return pointService.getRatingOfPoint(pointId, userId);
     }
 }

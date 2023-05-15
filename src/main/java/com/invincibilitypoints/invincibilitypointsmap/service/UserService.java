@@ -9,6 +9,7 @@ import com.invincibilitypoints.invincibilitypointsmap.enums.ETokenVerificationSt
 import com.invincibilitypoints.invincibilitypointsmap.events.OnPasswordRecoveryEvent;
 import com.invincibilitypoints.invincibilitypointsmap.events.OnRegistrationCompleteEvent;
 import com.invincibilitypoints.invincibilitypointsmap.model.MapPoint;
+import com.invincibilitypoints.invincibilitypointsmap.model.RatedPoint;
 import com.invincibilitypoints.invincibilitypointsmap.payload.response.TokenVerificationResponse;
 import com.invincibilitypoints.invincibilitypointsmap.security.models.RefreshToken;
 import com.invincibilitypoints.invincibilitypointsmap.security.models.Role;
@@ -130,7 +131,7 @@ public class UserService {
                 .email(signUpRequest.getEmail())
                 .password(encoder.encode(signUpRequest.getPassword()))
                 .points(Collections.emptySet())
-                .likedPoints(Collections.emptySet())
+                .ratedPoints(Collections.emptySet())
                 .userStatus(EStatus.INACTIVE)
                 .build();
 
@@ -207,7 +208,14 @@ public class UserService {
     public ResponseEntity<?> getLikedPoints(Long userId) {
         Optional<User> optionalUser = userRepository.findById(userId);
         return (optionalUser.isPresent()) ?
-                ResponseEntity.ok(optionalUser.get().getLikedPoints().stream().map(MapPointDto::fromPoint).toList()) :
+                ResponseEntity
+                        .ok(optionalUser
+                                .get()
+                                .getRatedPoints()
+                                .stream()
+                                .map((RatedPoint::getPoint))
+                                .map(MapPointDto::fromPoint)
+                                .toList()) :
                 ResponseEntity.badRequest().body(new MessageResponse("User id is invalid"));
     }
 
@@ -261,7 +269,7 @@ public class UserService {
         }
     }
 
-    private boolean isValidCode(User user, String code){
+    private boolean isValidCode(User user, String code) {
         int parsedCode = Integer.parseInt(code);
         if (code.length() != 6) {
             throw new NumberFormatException();

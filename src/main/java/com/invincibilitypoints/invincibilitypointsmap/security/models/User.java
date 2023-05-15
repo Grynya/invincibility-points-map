@@ -2,6 +2,7 @@ package com.invincibilitypoints.invincibilitypointsmap.security.models;
 
 import com.invincibilitypoints.invincibilitypointsmap.model.MapPoint;
 import com.invincibilitypoints.invincibilitypointsmap.enums.EStatus;
+import com.invincibilitypoints.invincibilitypointsmap.model.RatedPoint;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -45,8 +46,8 @@ public class User {
     @Enumerated(EnumType.STRING)
     private EStatus userStatus = EStatus.INACTIVE;
 
-    @ManyToMany(mappedBy = "usersWhoLiked")
-    Set<MapPoint> likedPoints;
+    @OneToMany(mappedBy = "user")
+    Set<RatedPoint> ratedPoints;
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     Set<Role> roles;
 

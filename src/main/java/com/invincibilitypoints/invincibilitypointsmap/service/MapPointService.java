@@ -2,13 +2,17 @@ package com.invincibilitypoints.invincibilitypointsmap.service;
 
 import com.invincibilitypoints.invincibilitypointsmap.converters.PointConverter;
 import com.invincibilitypoints.invincibilitypointsmap.dto.MapPointDto;
+import com.invincibilitypoints.invincibilitypointsmap.enums.ERating;
 import com.invincibilitypoints.invincibilitypointsmap.exceptions.BadRequestException;
 import com.invincibilitypoints.invincibilitypointsmap.model.MapPoint;
 import com.invincibilitypoints.invincibilitypointsmap.model.Resource;
+import com.invincibilitypoints.invincibilitypointsmap.model.RatedPoint;
 import com.invincibilitypoints.invincibilitypointsmap.payload.request.CreatePointRequest;
 import com.invincibilitypoints.invincibilitypointsmap.payload.request.PointRequest;
+import com.invincibilitypoints.invincibilitypointsmap.payload.request.RatePointRequest;
 import com.invincibilitypoints.invincibilitypointsmap.payload.response.CreateMapPointResponse;
 import com.invincibilitypoints.invincibilitypointsmap.repository.MapPointRepository;
+import com.invincibilitypoints.invincibilitypointsmap.repository.RatedPointRepository;
 import com.invincibilitypoints.invincibilitypointsmap.repository.ResourceRepository;
 import com.invincibilitypoints.invincibilitypointsmap.security.models.User;
 import com.invincibilitypoints.invincibilitypointsmap.security.payload.response.MessageResponse;
@@ -30,14 +34,17 @@ public class MapPointService {
     private final MapPointRepository mapPointRepository;
     private final UserRepository userRepository;
     private final ResourceRepository resourceRepository;
+    private final RatedPointRepository ratedPointRepository;
 
     @Autowired
     public MapPointService(MapPointRepository pointRepository,
                            UserRepository userRepository,
-                           ResourceRepository resourceRepository) {
+                           ResourceRepository resourceRepository,
+                           RatedPointRepository ratedPointRepository) {
         this.mapPointRepository = pointRepository;
         this.userRepository = userRepository;
         this.resourceRepository = resourceRepository;
+        this.ratedPointRepository = ratedPointRepository;
     }
 
     public ResponseEntity<?> filterPointsInBounds(PointRequest pointRequest) {
@@ -106,7 +113,7 @@ public class MapPointService {
                 .phone(createPointRequest.getPhone())
                 .hoursOfWork(createPointRequest.getHoursOfWork())
                 .coordinates(coordinates)
-                .usersWhoLiked(new HashSet<>())
+                .usersWhoRated(new HashSet<>())
                 .userOwner(user)
                 .build();
     }
@@ -119,28 +126,35 @@ public class MapPointService {
         } else return ResponseEntity.notFound().build();
     }
 
-    public ResponseEntity<?> likePoint(Long pointId, Long userId) {
-        Optional<MapPoint> pointOptional = mapPointRepository.findById(pointId);
-        Optional<User> userOptional = userRepository.findById(userId);
+    public ResponseEntity<?> ratePoint(RatePointRequest ratePointRequest) {
+        Optional<MapPoint> pointOptional = mapPointRepository.findById(ratePointRequest.getPointId());
+        Optional<User> userOptional = userRepository.findById(ratePointRequest.getUserId());
         if (userOptional.isEmpty())
             return ResponseEntity.badRequest().body(new MessageResponse("User id is invalid"));
         else if (pointOptional.isEmpty())
             return ResponseEntity.badRequest().body(new MessageResponse("Point id is invalid"));
         else {
-            Set<MapPoint> likedPoints = userOptional.get().getLikedPoints();
-            Set<User> usersWhoLiked = pointOptional.get().getUsersWhoLiked();
-
-            likedPoints.add(pointOptional.get());
-            usersWhoLiked.add(userOptional.get());
-
-            mapPointRepository.save(pointOptional.get());
-            userRepository.save(userOptional.get());
-
+            Optional<RatedPoint> ratedPointOptional =
+                    ratedPointRepository.findByUserAndPoint(userOptional.get(), pointOptional.get());
+            ratedPointOptional
+                    .ifPresentOrElse(ratedPoint -> {
+                                ratedPoint.setRating(ratePointRequest.getRating());
+                                ratedPointRepository.save(ratedPoint);
+                            },
+                            () -> {
+                                RatedPoint ratedPoint = RatedPoint
+                                        .builder()
+                                        .point(pointOptional.get())
+                                        .user(userOptional.get())
+                                        .rating(ratePointRequest.getRating())
+                                        .build();
+                                ratedPointRepository.save(ratedPoint);
+                            });
             return ResponseEntity.ok().build();
         }
     }
 
-    public ResponseEntity<?> unlikePoint(Long pointId, Long userId) {
+    public ResponseEntity<?> getRatingOfPoint(Long pointId, Long userId) {
         Optional<MapPoint> pointOptional = mapPointRepository.findById(pointId);
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isEmpty())
@@ -148,32 +162,15 @@ public class MapPointService {
         else if (pointOptional.isEmpty())
             return ResponseEntity.badRequest().body(new MessageResponse("Point id is invalid"));
         else {
-            Set<MapPoint> likedPoints = userOptional.get().getLikedPoints();
-            Set<User> usersWhoLiked = pointOptional.get().getUsersWhoLiked();
-
-            likedPoints.remove(pointOptional.get());
-            usersWhoLiked.remove(userOptional.get());
-
-            mapPointRepository.save(pointOptional.get());
-            userRepository.save(userOptional.get());
-
-            return ResponseEntity.ok().build();
-        }
-    }
-
-    public ResponseEntity<?> isLikedPoint(Long pointId, Long userId) {
-        Optional<MapPoint> pointOptional = mapPointRepository.findById(pointId);
-        Optional<User> userOptional = userRepository.findById(userId);
-        if (userOptional.isEmpty())
-            return ResponseEntity.badRequest().body(new MessageResponse("User id is invalid"));
-        else if (pointOptional.isEmpty())
-            return ResponseEntity.badRequest().body(new MessageResponse("Point id is invalid"));
-        else {
-            Set<MapPoint> likedPoints = userOptional.get().getLikedPoints();
-            Set<User> usersWhoLiked = pointOptional.get().getUsersWhoLiked();
-            boolean result = likedPoints.remove(pointOptional.get()) && usersWhoLiked.contains(userOptional.get());
-
-            return ResponseEntity.ok().body(result);
+            Optional<RatedPoint> ratedPointOptional =
+                    ratedPointRepository.findByUserAndPoint(userOptional.get(), pointOptional.get());
+            return ratedPointOptional
+                    .map(ratedPoint -> ResponseEntity
+                            .ok()
+                            .body(ratedPoint.getRating()))
+                    .orElseGet(() -> ResponseEntity
+                            .ok()
+                            .body(ERating.NOT_RATED));
         }
     }
 }
