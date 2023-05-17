@@ -18,8 +18,8 @@ public class RefreshToken {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long id;
 
-  @OneToOne
-  @JoinColumn(name = "user_id", referencedColumnName = "id")
+  @ManyToOne
+  @JoinColumn(name="user_id", nullable=false)
   private User user;
 
   @Column(nullable = false, unique = true)

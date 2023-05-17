@@ -49,6 +49,11 @@ public class User {
     @OneToMany(mappedBy = "user")
     Set<RatedPoint> ratedPoints;
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    @JoinTable(
+            name = "user_role",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
     Set<Role> roles;
 
 }

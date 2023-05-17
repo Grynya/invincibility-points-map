@@ -11,7 +11,6 @@ import lombok.*;
 @NoArgsConstructor
 @Builder(toBuilder = true)
 @Entity
-@Table(name = "users_liked_points")
 public class RatedPoint {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

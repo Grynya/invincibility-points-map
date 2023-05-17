@@ -3,6 +3,7 @@ package com.invincibilitypoints.invincibilitypointsmap.service;
 import com.invincibilitypoints.invincibilitypointsmap.dto.ErrorResponse;
 import com.invincibilitypoints.invincibilitypointsmap.dto.MapPointDto;
 import com.invincibilitypoints.invincibilitypointsmap.dto.UserDto;
+import com.invincibilitypoints.invincibilitypointsmap.enums.ERating;
 import com.invincibilitypoints.invincibilitypointsmap.enums.ERole;
 import com.invincibilitypoints.invincibilitypointsmap.enums.EStatus;
 import com.invincibilitypoints.invincibilitypointsmap.enums.ETokenVerificationStatus;
@@ -213,6 +214,7 @@ public class UserService {
                                 .get()
                                 .getRatedPoints()
                                 .stream()
+                                .filter(ratedPoint -> ratedPoint.getRating() == ERating.LIKED)
                                 .map((RatedPoint::getPoint))
                                 .map(MapPointDto::fromPoint)
                                 .toList()) :

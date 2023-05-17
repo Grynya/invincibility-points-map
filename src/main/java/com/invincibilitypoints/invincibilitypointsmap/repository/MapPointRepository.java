@@ -12,29 +12,15 @@ import java.util.List;
 @Repository
 public interface MapPointRepository extends JpaRepository<MapPoint, Long> {
 
-    @Query("SELECT photo.point FROM PointPhoto photo " +
-            "WHERE photo.fileName = ?1")
-    List<MapPoint> getPointByPhotoName(String photoName);
-
     boolean existsMapPointByCoordinates(Point coordinates);
 
-
-    @Query(value = "SELECT * FROM map_point WHERE " +
-            "ST_Intersects(coordinates, " +
-            "ST_MakeEnvelope(Point(:swLat, :swLng), Point(:neLat, :neLng)))",
+    @Query(value = "SELECT mp.*, " +
+            "(SELECT COUNT(*) FROM rated_point rp WHERE rp.point_id = mp.id AND rp.rating = 'DISLIKED') AS dislike_count " +
+            "FROM map_point mp " +
+            "WHERE ST_Intersects(coordinates, ST_MakeEnvelope(Point(:swLat, :swLng), Point(:neLat, :neLng))) " +
+            "HAVING dislike_count < 20",
             nativeQuery = true)
-    List<MapPoint> findByBounds(@Param("swLat") Double swLat, @Param("swLng") Double swLng,
-                                @Param("neLat") Double neLat, @Param("neLng") Double neLng);
-
-    @Query(value = "SELECT * FROM map_point WHERE " +
-            "user_owner = :userId AND " +
-            "ST_Intersects(coordinates, " +
-            "ST_MakeEnvelope(Point(:swLat, :swLng), Point(:neLat, :neLng)))",
-            nativeQuery = true)
-    List<MapPoint> findByBoundsAndUserId(@Param("userId") Long userId,
-                                         @Param("swLat") Double swLat,
-                                         @Param("swLng") Double swLng,
-                                         @Param("neLat") Double neLat,
-                                         @Param("neLng") Double neLng);
+    List<MapPoint> findByBoundsWithDislikes(@Param("swLat") Double swLat, @Param("swLng") Double swLng,
+                                            @Param("neLat") Double neLat, @Param("neLng") Double neLng);
 
 }

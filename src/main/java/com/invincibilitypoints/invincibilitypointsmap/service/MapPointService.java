@@ -3,7 +3,6 @@ package com.invincibilitypoints.invincibilitypointsmap.service;
 import com.invincibilitypoints.invincibilitypointsmap.converters.PointConverter;
 import com.invincibilitypoints.invincibilitypointsmap.dto.MapPointDto;
 import com.invincibilitypoints.invincibilitypointsmap.enums.ERating;
-import com.invincibilitypoints.invincibilitypointsmap.exceptions.BadRequestException;
 import com.invincibilitypoints.invincibilitypointsmap.model.MapPoint;
 import com.invincibilitypoints.invincibilitypointsmap.model.Resource;
 import com.invincibilitypoints.invincibilitypointsmap.model.RatedPoint;
@@ -48,29 +47,16 @@ public class MapPointService {
     }
 
     public ResponseEntity<?> filterPointsInBounds(PointRequest pointRequest) {
-        List<MapPoint> points = getPointsInBounds(pointRequest);
+        List<MapPoint> points = findByBoundsWithDislikes(pointRequest);
         return ResponseEntity.ok().body(points.stream().map(MapPointDto::fromPoint).toList());
     }
 
-    private List<MapPoint> getPointsInBounds(PointRequest pointRequest) {
-        Long userId = pointRequest.getUserId();
-        if (userId != null) {
-            Optional<User> user = userRepository.findById(userId);
-            if (user.isPresent()) {
-                return mapPointRepository.findByBoundsAndUserId(
-                        user.get().getId(),
-                        pointRequest.getSw().lat(),
-                        pointRequest.getSw().lng(),
-                        pointRequest.getNe().lat(),
-                        pointRequest.getNe().lng());
-            } else throw new BadRequestException("User id is invalid");
-        } else {
-            return mapPointRepository.findByBounds(
-                    pointRequest.getSw().lat(),
-                    pointRequest.getSw().lng(),
-                    pointRequest.getNe().lat(),
-                    pointRequest.getNe().lng());
-        }
+    private List<MapPoint> findByBoundsWithDislikes(PointRequest pointRequest) {
+        return mapPointRepository.findByBoundsWithDislikes(
+                pointRequest.getSw().lat(),
+                pointRequest.getSw().lng(),
+                pointRequest.getNe().lat(),
+                pointRequest.getNe().lng());
     }
 
     @Transactional

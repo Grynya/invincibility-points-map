@@ -16,5 +16,4 @@ public class PointRequest {
     private PointDto ne;
     @NotNull
     private Double zoom;
-    private Long userId;
 }
