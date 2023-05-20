@@ -28,6 +28,10 @@ public class MapPointController {
     public ResponseEntity<?> getPoints(@Valid @RequestBody PointRequest pointRequest) {
         return pointService.filterPointsInBounds(pointRequest);
     }
+    @GetMapping("/point/getAllByUser")
+    public ResponseEntity<?> getPointsByUser(@Valid @RequestParam Long userId) {
+        return pointService.getPointsByUser(userId);
+    }
     @PostMapping("/point")
     public ResponseEntity<?> createPoint(@Valid @RequestBody CreatePointRequest createPointRequest) {
         return pointService.createPoint(createPointRequest);

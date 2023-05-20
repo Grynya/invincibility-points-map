@@ -93,34 +93,26 @@ public class UserService {
 
         String jwt = jwtUtils.generateJwtToken(userDetails);
 
-        List<String> roles = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList());
-
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
 
         return ResponseEntity.ok(new JwtResponse(jwt, jwtExpirationMs, refreshToken.getToken(), userDetails.getId(),
-                userDetails.getUsername(), userDetails.getSurname(), userDetails.getEmail(), containsAdminRole(roles)));
+                userDetails.getName(), userDetails.getSurname(), userDetails.getEmail(),
+                userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet())));
     }
 
     public JwtResponse generateTokens(User user) {
 
         String jwt = jwtUtils.generateTokenFromEmail(user.getEmail());
 
-        List<String> roles = user
-                .getRoles()
-                .stream()
-                .map(Role::getName)
-                .map(Object::toString)
-                .toList();
-
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
 
         return new JwtResponse(jwt, jwtExpirationMs, refreshToken.getToken(), user.getId(),
-                user.getEmail(), user.getSurname(), user.getEmail(), containsAdminRole(roles));
-    }
-
-    private boolean containsAdminRole(List<String> roles) {
-        return roles.contains(ERole.ROLE_ADMIN.name());
+                user.getEmail(), user.getSurname(), user.getEmail(),
+                user
+                        .getRoles()
+                        .stream()
+                        .map(role -> role.getName().name())
+                        .collect(Collectors.toSet()));
     }
 
     @Transactional
@@ -202,8 +194,7 @@ public class UserService {
         Optional<User> user = userRepository.findByEmail(username);
         if (user.isEmpty())
             return ResponseEntity.badRequest().body(new MessageResponse("User id is invalid"));
-        return ResponseEntity.ok(new UserDto(user.get().getId(), user.get().getName(), user.get().getSurname(),
-                user.get().getEmail(), user.get().getUserStatus(), false));
+        return ResponseEntity.ok(UserDto.fromUser(user.get()));
     }
 
     public ResponseEntity<?> getLikedPoints(Long userId) {
@@ -277,5 +268,9 @@ public class UserService {
             throw new NumberFormatException();
         }
         return user.getCode().equals(parsedCode);
+    }
+
+    public ResponseEntity<?> getAllUsers() {
+        return ResponseEntity.ok().body(userRepository.findAll().stream().map(UserDto::fromUser));
     }
 }

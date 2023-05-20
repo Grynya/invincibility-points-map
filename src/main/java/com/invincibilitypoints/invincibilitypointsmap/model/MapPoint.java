@@ -43,13 +43,6 @@ public class MapPoint {
     @ManyToMany(mappedBy = "points")
     Set<Resource> resources;
 
-    //    @ManyToMany
-//    @JoinTable(
-//            name = "users_liked_points",
-//            joinColumns = @JoinColumn(name = "point_id"),
-//            inverseJoinColumns = @JoinColumn(name = "user_id")
-//    )
-//    Set<User> usersWhoLiked;
     @OneToMany(mappedBy = "point")
     private Set<RatedPoint> usersWhoRated;
 

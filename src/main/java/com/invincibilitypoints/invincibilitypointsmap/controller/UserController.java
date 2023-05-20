@@ -31,6 +31,10 @@ public class UserController {
     public ResponseEntity<?> getUserInfoByAccessToken(@Valid @RequestParam String accessToken) {
         return userService.getUserInfoByAccessToken(accessToken);
     }
+    @GetMapping("/admin/getAllUsers")
+    public ResponseEntity<?> getAllUsers() {
+        return userService.getAllUsers();
+    }
 
     @GetMapping("/user/likedPoints")
     public ResponseEntity<?> getLikedPoints(@Valid @RequestParam Long userId) {

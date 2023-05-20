@@ -159,4 +159,11 @@ public class MapPointService {
                             .body(ERating.NOT_RATED));
         }
     }
+
+    public ResponseEntity<?> getPointsByUser(Long userId) {
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty())
+            return ResponseEntity.badRequest().body(new MessageResponse("User id is invalid"));
+        return ResponseEntity.ok().body(mapPointRepository.findMapPointByUserOwner(userOptional.get()).stream().map(MapPointDto::fromPoint).toList());
+    }
 }

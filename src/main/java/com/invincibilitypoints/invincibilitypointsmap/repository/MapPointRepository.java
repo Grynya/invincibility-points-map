@@ -1,6 +1,7 @@
 package com.invincibilitypoints.invincibilitypointsmap.repository;
 
 import com.invincibilitypoints.invincibilitypointsmap.model.MapPoint;
+import com.invincibilitypoints.invincibilitypointsmap.security.models.User;
 import org.locationtech.jts.geom.Point;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -23,4 +24,5 @@ public interface MapPointRepository extends JpaRepository<MapPoint, Long> {
     List<MapPoint> findByBoundsWithDislikes(@Param("swLat") Double swLat, @Param("swLng") Double swLng,
                                             @Param("neLat") Double neLat, @Param("neLng") Double neLng);
 
+    List<MapPoint> findMapPointByUserOwner(User user);
 }

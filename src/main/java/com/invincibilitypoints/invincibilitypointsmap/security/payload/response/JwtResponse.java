@@ -2,6 +2,9 @@ package com.invincibilitypoints.invincibilitypointsmap.security.payload.response
 
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.Set;
+
 @Getter
 @Setter
 public class JwtResponse {
@@ -13,10 +16,9 @@ public class JwtResponse {
 	private String name;
     private String surname;
     private String email;
-
-    private boolean isAdmin;
+    private Set<String> roles;
     public JwtResponse(String accessToken, int expiresIn, String refreshToken, Long id,
-                       String name, String surname, String email, boolean isAdmin) {
+                       String name, String surname, String email, Set<String> roles) {
         this.accessToken = accessToken;
         this.expiresIn = expiresIn;
         this.refreshToken = refreshToken;
@@ -24,6 +26,6 @@ public class JwtResponse {
         this.name = name;
         this.surname = surname;
         this.email = email;
-        this.isAdmin=isAdmin;
+        this.roles = roles;
     }
 }
