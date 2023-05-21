@@ -99,10 +99,21 @@ FROM user
 WHERE id BETWEEN @start_id AND @end_id;
 
 
+INSERT INTO user (id, code, email, name, password, surname, user_status)
+VALUES (33, NULL, 'email1ToDelete@example.com', 'Asa', '123', 'Jacobson', 'ACTIVE'),
+       (34, NULL, 'email2ToDelete@example.com', 'Elias', '123', 'Ortega', 'ACTIVE');
 
-INSERT INTO map_point (coordinates, description, hours_of_work, name, phone, user_owner)
-VALUES (ST_GeomFromText('POINT(49.96585677169776 33.61018554839228)'), 'Пункт незламності', '08.00-20.00', 'Кафе',
-        '5555-0000', 1);
+INSERT INTO map_point (id, coordinates, description, hours_of_work, name, phone, user_owner)
+VALUES (3, ST_GeomFromText('POINT(49.965861 33.610194)'), 'Пункт toDelete', '08.00-20.00', 'Кафе',
+        '5555-0000', 33),
+       (4, ST_GeomFromText('POINT(49.973993 33.602435)'), 'Пункт toDelete2', '08.00-20.00', 'Кафе',
+        '5555-0000', 34);
+
+INSERT INTO rated_point (rating, user_id, point_id)
+values ('LIKED', 33, 3),
+       ('LIKED', 33, 4),
+       ('LIKED', 34, 3),
+       ('LIKED', 34, 4);
 
 -- insert 20 dislikes
 SET @start_id = (SELECT MAX(id) - 19

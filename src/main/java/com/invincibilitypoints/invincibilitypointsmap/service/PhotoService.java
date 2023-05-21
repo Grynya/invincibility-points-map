@@ -57,4 +57,8 @@ public class PhotoService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error uploading file!");
         }
     }
+
+    public void deleteByMapPoint(MapPoint mapPoint) {
+        photoRepository.deleteByPoint(mapPoint);
+    }
 }

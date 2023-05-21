@@ -30,16 +30,18 @@ import java.util.Set;
 
 @Service
 public class MapPointService {
+    private final PhotoService photoService;
     private final MapPointRepository mapPointRepository;
     private final UserRepository userRepository;
     private final ResourceRepository resourceRepository;
     private final RatedPointRepository ratedPointRepository;
 
     @Autowired
-    public MapPointService(MapPointRepository pointRepository,
+    public MapPointService(PhotoService photoService, MapPointRepository pointRepository,
                            UserRepository userRepository,
                            ResourceRepository resourceRepository,
                            RatedPointRepository ratedPointRepository) {
+        this.photoService = photoService;
         this.mapPointRepository = pointRepository;
         this.userRepository = userRepository;
         this.resourceRepository = resourceRepository;
@@ -165,5 +167,20 @@ public class MapPointService {
         if (userOptional.isEmpty())
             return ResponseEntity.badRequest().body(new MessageResponse("User id is invalid"));
         return ResponseEntity.ok().body(mapPointRepository.findMapPointByUserOwner(userOptional.get()).stream().map(MapPointDto::fromPoint).toList());
+    }
+
+    @Transactional
+    public ResponseEntity<?> deleteMapPoint(Long pointId) {
+        Optional<MapPoint> mapPointOptional = mapPointRepository.findById(pointId);
+        if (mapPointOptional.isEmpty())
+            return ResponseEntity.badRequest().body(new MessageResponse("Map point id is invalid"));
+        mapPointOptional.get().getResources().forEach(resource -> {
+            resource.getPoints().remove(mapPointOptional.get());
+            resourceRepository.save(resource);
+        });
+        ratedPointRepository.deleteByPoint(mapPointOptional.get());
+        photoService.deleteByMapPoint(mapPointOptional.get());
+        mapPointRepository.delete(mapPointOptional.get());
+        return ResponseEntity.ok().build();
     }
 }
