@@ -1,6 +1,6 @@
-package com.invincibilitypoints.invincibilitypointsmap.security.security.services;
+package com.invincibilitypoints.invincibilitypointsmap.security.security.service;
 
-import com.invincibilitypoints.invincibilitypointsmap.security.models.User;
+import com.invincibilitypoints.invincibilitypointsmap.security.model.User;
 import com.invincibilitypoints.invincibilitypointsmap.security.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

@@ -2,7 +2,7 @@ package com.invincibilitypoints.invincibilitypointsmap.security.security.jwt;
 
 import java.io.IOException;
 
-import com.invincibilitypoints.invincibilitypointsmap.security.security.services.UserDetailsServiceImpl;
+import com.invincibilitypoints.invincibilitypointsmap.security.security.service.UserDetailsServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -50,11 +50,9 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
   private String parseJwt(HttpServletRequest request) {
     String headerAuth = request.getHeader("Authorization");
-
     if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
         return headerAuth.substring(7);
     }
-
     return null;
   }
 }

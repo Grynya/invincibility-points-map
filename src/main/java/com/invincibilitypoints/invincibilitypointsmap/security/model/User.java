@@ -1,4 +1,4 @@
-package com.invincibilitypoints.invincibilitypointsmap.security.models;
+package com.invincibilitypoints.invincibilitypointsmap.security.model;
 
 import com.invincibilitypoints.invincibilitypointsmap.model.MapPoint;
 import com.invincibilitypoints.invincibilitypointsmap.enums.EStatus;

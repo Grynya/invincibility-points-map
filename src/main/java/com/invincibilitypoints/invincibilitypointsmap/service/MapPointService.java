@@ -13,7 +13,7 @@ import com.invincibilitypoints.invincibilitypointsmap.payload.response.CreateMap
 import com.invincibilitypoints.invincibilitypointsmap.repository.MapPointRepository;
 import com.invincibilitypoints.invincibilitypointsmap.repository.RatedPointRepository;
 import com.invincibilitypoints.invincibilitypointsmap.repository.ResourceRepository;
-import com.invincibilitypoints.invincibilitypointsmap.security.models.User;
+import com.invincibilitypoints.invincibilitypointsmap.security.model.User;
 import com.invincibilitypoints.invincibilitypointsmap.security.payload.response.MessageResponse;
 import com.invincibilitypoints.invincibilitypointsmap.security.repository.UserRepository;
 import org.locationtech.jts.geom.Point;

@@ -1,7 +1,7 @@
 package com.invincibilitypoints.invincibilitypointsmap.dto;
 
 import com.invincibilitypoints.invincibilitypointsmap.enums.EStatus;
-import com.invincibilitypoints.invincibilitypointsmap.security.models.User;
+import com.invincibilitypoints.invincibilitypointsmap.security.model.User;
 
 import java.util.Set;
 import java.util.stream.Collectors;

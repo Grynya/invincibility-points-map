@@ -1,8 +1,8 @@
 package com.invincibilitypoints.invincibilitypointsmap.controller;
 
 import com.invincibilitypoints.invincibilitypointsmap.security.payload.response.MessageResponse;
-import com.invincibilitypoints.invincibilitypointsmap.security.security.services.RefreshTokenService;
-import com.invincibilitypoints.invincibilitypointsmap.security.security.services.UserDetailsImpl;
+import com.invincibilitypoints.invincibilitypointsmap.security.security.service.RefreshTokenService;
+import com.invincibilitypoints.invincibilitypointsmap.security.security.service.UserDetailsImpl;
 import com.invincibilitypoints.invincibilitypointsmap.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

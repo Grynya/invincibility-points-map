@@ -1,7 +1,7 @@
-package com.invincibilitypoints.invincibilitypointsmap.security.security.services;
+package com.invincibilitypoints.invincibilitypointsmap.security.security.service;
 
 import com.invincibilitypoints.invincibilitypointsmap.security.exception.TokenRefreshException;
-import com.invincibilitypoints.invincibilitypointsmap.security.models.RefreshToken;
+import com.invincibilitypoints.invincibilitypointsmap.security.model.RefreshToken;
 import com.invincibilitypoints.invincibilitypointsmap.security.payload.request.TokenRefreshRequest;
 import com.invincibilitypoints.invincibilitypointsmap.security.payload.response.TokenRefreshResponse;
 import com.invincibilitypoints.invincibilitypointsmap.security.repository.RefreshTokenRepository;

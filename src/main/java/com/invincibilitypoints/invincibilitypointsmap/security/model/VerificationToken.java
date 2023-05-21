@@ -1,4 +1,4 @@
-package com.invincibilitypoints.invincibilitypointsmap.security.models;
+package com.invincibilitypoints.invincibilitypointsmap.security.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;

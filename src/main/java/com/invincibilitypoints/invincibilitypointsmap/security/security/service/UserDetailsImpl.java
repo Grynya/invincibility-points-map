@@ -1,8 +1,8 @@
-package com.invincibilitypoints.invincibilitypointsmap.security.security.services;
+package com.invincibilitypoints.invincibilitypointsmap.security.security.service;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.invincibilitypoints.invincibilitypointsmap.enums.EStatus;
-import com.invincibilitypoints.invincibilitypointsmap.security.models.User;
+import com.invincibilitypoints.invincibilitypointsmap.security.model.User;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;

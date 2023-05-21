@@ -1,7 +1,7 @@
 package com.invincibilitypoints.invincibilitypointsmap.model;
 
 import com.invincibilitypoints.invincibilitypointsmap.enums.ERating;
-import com.invincibilitypoints.invincibilitypointsmap.security.models.User;
+import com.invincibilitypoints.invincibilitypointsmap.security.model.User;
 import jakarta.persistence.*;
 import lombok.*;
 

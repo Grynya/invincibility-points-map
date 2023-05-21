@@ -2,7 +2,7 @@ package com.invincibilitypoints.invincibilitypointsmap.security.security;
 
 import com.invincibilitypoints.invincibilitypointsmap.security.security.jwt.AuthEntryPointJwt;
 import com.invincibilitypoints.invincibilitypointsmap.security.security.jwt.AuthTokenFilter;
-import com.invincibilitypoints.invincibilitypointsmap.security.security.services.UserDetailsServiceImpl;
+import com.invincibilitypoints.invincibilitypointsmap.security.security.service.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

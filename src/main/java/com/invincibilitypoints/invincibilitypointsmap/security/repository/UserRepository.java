@@ -1,6 +1,6 @@
 package com.invincibilitypoints.invincibilitypointsmap.security.repository;
 
-import com.invincibilitypoints.invincibilitypointsmap.security.models.User;
+import com.invincibilitypoints.invincibilitypointsmap.security.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

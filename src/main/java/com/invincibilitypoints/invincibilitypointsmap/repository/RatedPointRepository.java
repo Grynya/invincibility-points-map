@@ -2,7 +2,7 @@ package com.invincibilitypoints.invincibilitypointsmap.repository;
 
 import com.invincibilitypoints.invincibilitypointsmap.model.MapPoint;
 import com.invincibilitypoints.invincibilitypointsmap.model.RatedPoint;
-import com.invincibilitypoints.invincibilitypointsmap.security.models.User;
+import com.invincibilitypoints.invincibilitypointsmap.security.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

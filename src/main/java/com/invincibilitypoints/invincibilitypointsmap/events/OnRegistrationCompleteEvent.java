@@ -1,6 +1,6 @@
 package com.invincibilitypoints.invincibilitypointsmap.events;
 
-import com.invincibilitypoints.invincibilitypointsmap.security.models.User;
+import com.invincibilitypoints.invincibilitypointsmap.security.model.User;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.context.ApplicationEvent;

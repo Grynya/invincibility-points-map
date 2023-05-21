@@ -1,13 +1,12 @@
-package com.invincibilitypoints.invincibilitypointsmap.security.controllers;
+package com.invincibilitypoints.invincibilitypointsmap.security.controller;
 
 import com.invincibilitypoints.invincibilitypointsmap.enums.ETokenVerificationStatus;
 import com.invincibilitypoints.invincibilitypointsmap.payload.response.TokenVerificationResponse;
 import com.invincibilitypoints.invincibilitypointsmap.security.payload.request.LoginRequest;
 import com.invincibilitypoints.invincibilitypointsmap.security.payload.request.SignupRequest;
 import com.invincibilitypoints.invincibilitypointsmap.security.payload.request.TokenRefreshRequest;
-import com.invincibilitypoints.invincibilitypointsmap.security.payload.response.MessageResponse;
-import com.invincibilitypoints.invincibilitypointsmap.security.security.services.RefreshTokenService;
-import com.invincibilitypoints.invincibilitypointsmap.security.security.services.UserDetailsImpl;
+import com.invincibilitypoints.invincibilitypointsmap.security.security.jwt.JwtUtils;
+import com.invincibilitypoints.invincibilitypointsmap.security.security.service.RefreshTokenService;
 import com.invincibilitypoints.invincibilitypointsmap.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -15,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
@@ -27,13 +25,16 @@ public class AuthController {
 
     private final RefreshTokenService refreshTokenService;
 
+    private final JwtUtils jwtUtils;
+
     @Value("${jwt_expiration_ms}")
     int jwtExpirationMs;
 
     @Autowired
-    public AuthController(UserService userService, RefreshTokenService refreshTokenService) {
+    public AuthController(UserService userService, RefreshTokenService refreshTokenService, JwtUtils jwtUtils) {
         this.userService = userService;
         this.refreshTokenService = refreshTokenService;
+        this.jwtUtils = jwtUtils;
     }
 
     @PostMapping("/signin")
@@ -47,7 +48,7 @@ public class AuthController {
     }
 
     @GetMapping("/registrationConfirm")
-    public RedirectView confirmRegistration(@RequestParam("token") final String token) {
+    public RedirectView confirmRegistration(@RequestParam final String token) {
         final TokenVerificationResponse result = userService.validateVerificationToken(token);
         String url = "http://localhost:3000";
         if (result.eTokenVerificationStatus().equals(ETokenVerificationStatus.TOKEN_VALID)) {
@@ -82,4 +83,8 @@ public class AuthController {
         return userService.updatePasswordRecovery(userEmail, code, password);
     }
 
+    @GetMapping("/isLoggedIn")
+    public ResponseEntity<?> isLoggedIn(@RequestParam final String token) {
+        return jwtUtils.isLoggedIn(token);
+    }
 }

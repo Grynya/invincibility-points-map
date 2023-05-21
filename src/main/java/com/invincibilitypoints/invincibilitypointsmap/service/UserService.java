@@ -12,10 +12,10 @@ import com.invincibilitypoints.invincibilitypointsmap.events.OnRegistrationCompl
 import com.invincibilitypoints.invincibilitypointsmap.model.MapPoint;
 import com.invincibilitypoints.invincibilitypointsmap.model.RatedPoint;
 import com.invincibilitypoints.invincibilitypointsmap.payload.response.TokenVerificationResponse;
-import com.invincibilitypoints.invincibilitypointsmap.security.models.RefreshToken;
-import com.invincibilitypoints.invincibilitypointsmap.security.models.Role;
-import com.invincibilitypoints.invincibilitypointsmap.security.models.User;
-import com.invincibilitypoints.invincibilitypointsmap.security.models.VerificationToken;
+import com.invincibilitypoints.invincibilitypointsmap.security.model.RefreshToken;
+import com.invincibilitypoints.invincibilitypointsmap.security.model.Role;
+import com.invincibilitypoints.invincibilitypointsmap.security.model.User;
+import com.invincibilitypoints.invincibilitypointsmap.security.model.VerificationToken;
 import com.invincibilitypoints.invincibilitypointsmap.security.payload.request.LoginRequest;
 import com.invincibilitypoints.invincibilitypointsmap.security.payload.request.SignupRequest;
 import com.invincibilitypoints.invincibilitypointsmap.security.payload.response.JwtResponse;
@@ -24,8 +24,8 @@ import com.invincibilitypoints.invincibilitypointsmap.security.repository.RoleRe
 import com.invincibilitypoints.invincibilitypointsmap.security.repository.UserRepository;
 import com.invincibilitypoints.invincibilitypointsmap.security.repository.VerificationTokenRepository;
 import com.invincibilitypoints.invincibilitypointsmap.security.security.jwt.JwtUtils;
-import com.invincibilitypoints.invincibilitypointsmap.security.security.services.RefreshTokenService;
-import com.invincibilitypoints.invincibilitypointsmap.security.security.services.UserDetailsImpl;
+import com.invincibilitypoints.invincibilitypointsmap.security.security.service.RefreshTokenService;
+import com.invincibilitypoints.invincibilitypointsmap.security.security.service.UserDetailsImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

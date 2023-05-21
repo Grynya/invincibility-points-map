@@ -1,7 +1,7 @@
 package com.invincibilitypoints.invincibilitypointsmap.listeners;
 
 import com.invincibilitypoints.invincibilitypointsmap.events.OnRegistrationCompleteEvent;
-import com.invincibilitypoints.invincibilitypointsmap.security.models.User;
+import com.invincibilitypoints.invincibilitypointsmap.security.model.User;
 import com.invincibilitypoints.invincibilitypointsmap.service.UserService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;

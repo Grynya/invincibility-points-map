@@ -1,7 +1,7 @@
 package com.invincibilitypoints.invincibilitypointsmap.repository;
 
 import com.invincibilitypoints.invincibilitypointsmap.model.MapPoint;
-import com.invincibilitypoints.invincibilitypointsmap.security.models.User;
+import com.invincibilitypoints.invincibilitypointsmap.security.model.User;
 import org.locationtech.jts.geom.Point;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
