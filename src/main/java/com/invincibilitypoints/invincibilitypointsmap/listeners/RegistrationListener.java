@@ -50,12 +50,12 @@ public class RegistrationListener implements
         String subject = "Мапа пунктів незламності";
 
 
-        String confirmationUrl = event.getAppUrl() + "public/registrationConfirm?token=" + token;
-
-        String message = "<div style=\"background-color: #f0f0f0; padding: 20px; border-radius: 5px;\">"
+        String confirmationUrl = event.getAppUrl() + "/public/registrationConfirm?token=" + token;
+        String message =
+                "<div style=\"background-color: #f0f0f0; padding: 20px; border-radius: 5px;\">"
                 + "<h1>Підтвердіть свою електронну адресу</h1>"
                 + "<p>Для підтвердження своєї електронної адреси пошти перейдіть за посиланням. Посилання буде дійсне протягом 1 години</p>"
-                + "<a href=\"http://localhost:8080/" + confirmationUrl + "\" style=\"background-color: #008CBA; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none;\">Підтвердити</a>"
+                + "<a href=\"http://" + confirmationUrl + "\" style=\"background-color: #008CBA; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none;\">Підтвердити</a>"
                 + "</div>";
 
         MimeMessage email = mailSender.createMimeMessage();

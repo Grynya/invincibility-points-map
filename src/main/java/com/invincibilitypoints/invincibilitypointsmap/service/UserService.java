@@ -54,6 +54,7 @@ public class UserService {
     private final ApplicationEventPublisher eventPublisher;
     private final VerificationTokenRepository verificationTokenRepository;
     private final RefreshTokenService refreshTokenService;
+    private final HttpServletRequest request;
 
     @Value("${jwt_expiration_ms}")
     int jwtExpirationMs;
@@ -66,7 +67,7 @@ public class UserService {
                        PasswordEncoder encoder,
                        ApplicationEventPublisher eventPublisher,
                        VerificationTokenRepository verificationTokenRepository,
-                       RefreshTokenService refreshTokenService) {
+                       RefreshTokenService refreshTokenService, HttpServletRequest request) {
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;
         this.userRepository = userRepository;
@@ -75,6 +76,7 @@ public class UserService {
         this.eventPublisher = eventPublisher;
         this.verificationTokenRepository = verificationTokenRepository;
         this.refreshTokenService = refreshTokenService;
+        this.request = request;
     }
 
     public ResponseEntity<?> authenticateUserWithCredentials(LoginRequest loginRequest) {
@@ -137,12 +139,13 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public ResponseEntity<?> registration(SignupRequest signUpRequest, HttpServletRequest request) {
+    public ResponseEntity<?> registration(SignupRequest signUpRequest) {
         if (userRepository.existsByEmail(signUpRequest.getEmail())) {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!"));
         }
         User registered = createUser(signUpRequest);
-        String appUrl = request.getContextPath();
+        String appUrl = request.getHeader("Host");
+        System.out.println(appUrl);
         eventPublisher.publishEvent(new OnRegistrationCompleteEvent(registered,
                 request.getLocale(), appUrl));
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));

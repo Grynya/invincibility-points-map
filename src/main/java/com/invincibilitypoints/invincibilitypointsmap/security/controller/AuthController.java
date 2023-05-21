@@ -22,14 +22,13 @@ import org.springframework.web.servlet.view.RedirectView;
 @RequestMapping("/public")
 public class AuthController {
     private final UserService userService;
-
     private final RefreshTokenService refreshTokenService;
-
     private final JwtUtils jwtUtils;
-
     @Value("${jwt_expiration_ms}")
     int jwtExpirationMs;
 
+    @Value("${frontend.endpoint}")
+    String frontendEndpoint;
     @Autowired
     public AuthController(UserService userService, RefreshTokenService refreshTokenService, JwtUtils jwtUtils) {
         this.userService = userService;
@@ -43,21 +42,20 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest, HttpServletRequest request) {
-        return userService.registration(signUpRequest, request);
+    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
+        return userService.registration(signUpRequest);
     }
 
     @GetMapping("/registrationConfirm")
     public RedirectView confirmRegistration(@RequestParam final String token) {
         final TokenVerificationResponse result = userService.validateVerificationToken(token);
-        String url = "http://localhost:3000";
         if (result.eTokenVerificationStatus().equals(ETokenVerificationStatus.TOKEN_VALID)) {
-            return new RedirectView( url + "/successVerification" +
+            return new RedirectView( frontendEndpoint + "/successVerification" +
                     "?accessToken=" + result.jwtResponse().getAccessToken()+
                     "&refreshToken=" + result.jwtResponse().getRefreshToken()+
                     "&expiresIn=" + result.jwtResponse().getExpiresIn());
         }
-        return new RedirectView(url + "/errorVerification?errorMessage=" + result.eTokenVerificationStatus());
+        return new RedirectView(frontendEndpoint + "/errorVerification?errorMessage=" + result.eTokenVerificationStatus());
     }
     @PostMapping("/refreshtoken")
     public ResponseEntity<?> refreshToken(@Valid @RequestBody TokenRefreshRequest request) {
