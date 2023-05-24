@@ -16,6 +16,8 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.UUID;
 
 @Component
@@ -25,6 +27,7 @@ public class RegistrationListener implements
     private final UserService userService;
 
     private final JavaMailSender mailSender;
+    ResourceBundle messages = ResourceBundle.getBundle("messages", new Locale("ua"));
 
     @Autowired
     public RegistrationListener(UserService userService, JavaMailSender mailSender) {
@@ -49,12 +52,14 @@ public class RegistrationListener implements
         String recipientAddress = user.getEmail();
         String subject = "Мапа пунктів незламності";
 
+        String confirmationHeader = messages.getString("email.confirmation.header");
+        String confirmationDesc = messages.getString("email.confirmation.desc");
 
         String confirmationUrl = event.getAppUrl() + "/public/registrationConfirm?token=" + token;
         String message =
                 "<div style=\"background-color: #f0f0f0; padding: 20px; border-radius: 5px;\">"
-                + "<h1>Підтвердіть свою електронну адресу</h1>"
-                + "<p>Для підтвердження своєї електронної адреси пошти перейдіть за посиланням. Посилання буде дійсне протягом 1 години</p>"
+                + "<h1>"+confirmationHeader+"</h1>"
+                + "<p>"+confirmationDesc+"</p>"
                 + "<a href=\"http://" + confirmationUrl + "\" style=\"background-color: #008CBA; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none;\">Підтвердити</a>"
                 + "</div>";
 

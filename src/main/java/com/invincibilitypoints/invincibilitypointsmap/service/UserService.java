@@ -57,8 +57,6 @@ public class UserService {
     private final RefreshTokenService refreshTokenService;
     private final HttpServletRequest request;
     ResourceBundle errors = ResourceBundle.getBundle("errors", new Locale("ua"));
-    ResourceBundle success = ResourceBundle.getBundle("success", new Locale("ua"));
-
     @Value("${jwt_expiration_ms}")
     int jwtExpirationMs;
 
@@ -259,7 +257,7 @@ public class UserService {
                     user.setPassword(encoder.encode(password));
                     user.setCode(null);
                     userRepository.save(user);
-                    return ResponseEntity.ok().body(success.getString("updated_password"));
+                    return ResponseEntity.ok().build();
                 } else {
                     return ResponseEntity.badRequest().body(new MessageResponse(errors.getString("invalid_code")));
                 }
