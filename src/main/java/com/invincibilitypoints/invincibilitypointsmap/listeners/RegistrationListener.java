@@ -60,8 +60,10 @@ public class RegistrationListener implements
 
         MimeMessage email = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(email, true, "UTF-8");
+
         InputStreamSource logoInputStreamSource = new ByteArrayResource(Files
-                .readAllBytes(Paths.get("D:\\Idea Projects\\invincibility-points-map\\src\\main\\java\\com\\invincibilitypoints\\invincibilitypointsmap\\listeners\\img\\logo.png")));
+                .readAllBytes(Paths
+                        .get("src/main/java/com/invincibilitypoints/invincibilitypointsmap/listeners/img/logo.png")));
         helper.addAttachment("logo.png", logoInputStreamSource, "image/svg+xml");
         try {
             helper.setTo(recipientAddress);

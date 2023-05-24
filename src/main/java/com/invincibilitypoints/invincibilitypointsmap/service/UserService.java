@@ -43,6 +43,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.ResourceBundle;
 
 @Service
 public class UserService {
@@ -55,6 +56,8 @@ public class UserService {
     private final VerificationTokenRepository verificationTokenRepository;
     private final RefreshTokenService refreshTokenService;
     private final HttpServletRequest request;
+    ResourceBundle errors = ResourceBundle.getBundle("errors", new Locale("ua"));
+    ResourceBundle success = ResourceBundle.getBundle("success", new Locale("ua"));
 
     @Value("${jwt_expiration_ms}")
     int jwtExpirationMs;
@@ -89,8 +92,9 @@ public class UserService {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
         if (userDetails.getUserStatus().equals(EStatus.INACTIVE)) {
-            ErrorResponse errorResponse = new ErrorResponse("User is inactive");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponse(errors.getString("inactive_user")));
         }
 
         String jwt = jwtUtils.generateJwtToken(userDetails);
@@ -132,7 +136,7 @@ public class UserService {
 
         Set<Role> roles = new HashSet<>();
         Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                .orElseThrow(() -> new RuntimeException(errors.getString("invalid_user_id")));
         roles.add(userRole);
 
         user.setRoles(roles);
@@ -141,14 +145,16 @@ public class UserService {
 
     public ResponseEntity<?> registration(SignupRequest signUpRequest) {
         if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!"));
+            return ResponseEntity.badRequest().body(errors.getString("email_in_use"));
         }
         User registered = createUser(signUpRequest);
         String appUrl = request.getHeader("Host");
-        System.out.println(appUrl);
         eventPublisher.publishEvent(new OnRegistrationCompleteEvent(registered,
                 request.getLocale(), appUrl));
-        return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+//        String appUrl = request.getHeader("Host");
+//        eventPublisher.publishEvent(new OnRegistrationCompleteEvent(userRepository.findByEmail("hrynenko.anastasia@gmail.com").get(),
+//                request.getLocale(), appUrl));
+        return ResponseEntity.ok().build();
     }
 
     public ResponseEntity<?> getPoints(Long id) {
@@ -161,7 +167,7 @@ public class UserService {
             }
             return ResponseEntity.ok().body(pointDtos);
         }
-        return ResponseEntity.badRequest().body(new MessageResponse("User id is invalid"));
+        return ResponseEntity.badRequest().body(new MessageResponse(errors.getString("invalid_user_id")));
     }
 
     public void createVerificationToken(User user, String token) {
@@ -196,7 +202,7 @@ public class UserService {
         String username = jwtUtils.getEmailFromJwtToken(accessToken);
         Optional<User> user = userRepository.findByEmail(username);
         if (user.isEmpty())
-            return ResponseEntity.badRequest().body(new MessageResponse("User id is invalid"));
+            return ResponseEntity.badRequest().body(new MessageResponse(errors.getString("invalid_user_id")));
         return ResponseEntity.ok(UserDto.fromUser(user.get()));
     }
 
@@ -212,13 +218,13 @@ public class UserService {
                                 .map((RatedPoint::getPoint))
                                 .map(MapPointDto::fromPoint)
                                 .toList()) :
-                ResponseEntity.badRequest().body(new MessageResponse("User id is invalid"));
+                ResponseEntity.badRequest().body(new MessageResponse(errors.getString("invalid_user_id")));
     }
 
     public ResponseEntity<?> sendEmailPasswordRecovery(String userEmail, HttpServletRequest request) {
         Optional<User> optionalUser = userRepository.findByEmail(userEmail);
         if (optionalUser.isEmpty()) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Не коректна електронна адреса"));
+            return ResponseEntity.badRequest().body(new MessageResponse(errors.getString("invalid_user_email")));
         }
         String appUrl = request.getContextPath();
         System.out.println("service");
@@ -231,12 +237,12 @@ public class UserService {
     public ResponseEntity<?> checkCodePasswordRecovery(String userEmail, String code) {
         Optional<User> optionalUser = userRepository.findByEmail(userEmail);
         if (optionalUser.isEmpty()) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Не коректна електронна адреса"));
+            return ResponseEntity.badRequest().body(new MessageResponse(errors.getString("invalid_user_email")));
         }
         try {
             return ResponseEntity.ok().body(isValidCode(optionalUser.get(), code));
         } catch (NumberFormatException e) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Не правильно введений код. Код повинен бути 6-значним числом"));
+            return ResponseEntity.badRequest().body(new MessageResponse(errors.getString("invalid_code")));
         }
     }
 
@@ -253,15 +259,29 @@ public class UserService {
                     user.setPassword(encoder.encode(password));
                     user.setCode(null);
                     userRepository.save(user);
-                    return ResponseEntity.ok().body("Пароль змінено");
+                    return ResponseEntity.ok().body(success.getString("updated_password"));
                 } else {
-                    return ResponseEntity.badRequest().body(new MessageResponse("Не правильно введений код. Код повинен бути 6-значним числом"));
+                    return ResponseEntity.badRequest().body(new MessageResponse(errors.getString("invalid_code")));
                 }
             } catch (NumberFormatException e) {
-                return ResponseEntity.badRequest().body(new MessageResponse("Не правильно введений код. Код повинен бути 6-значним числом"));
+                return ResponseEntity.badRequest().body(new MessageResponse(errors.getString("invalid_code")));
             }
         } else {
-            return ResponseEntity.badRequest().body(new MessageResponse("Не коректна електронна адреса"));
+            return ResponseEntity.badRequest().body(new MessageResponse(errors.getString("invalid_user_email")));
+        }
+    }
+
+    public ResponseEntity<?> logout(){
+        try {
+            UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder
+                    .getContext()
+                    .getAuthentication()
+                    .getPrincipal();
+            Long userId = userDetails.getId();
+            refreshTokenService.deleteByUserId(userId);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new MessageResponse(e.getMessage()));
         }
     }
 

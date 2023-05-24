@@ -14,7 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.Locale;
 import java.util.Optional;
+import java.util.ResourceBundle;
 import java.util.UUID;
 
 
@@ -32,6 +34,7 @@ public class RefreshTokenService {
     private UserRepository userRepository;
 
     @Value("${jwt_expiration_ms}")int jwtExpirationMs;
+    ResourceBundle errors = ResourceBundle.getBundle("errors", new Locale("ua"));
 
     public Optional<RefreshToken> findByToken(String token) {
         return refreshTokenRepository.findByToken(token);
@@ -77,6 +80,6 @@ public class RefreshTokenService {
     public void deleteByUserId(Long userId) throws Exception {
         if (userRepository.findById(userId).isPresent())
             refreshTokenRepository.deleteByUser(userRepository.findById(userId).get());
-        else throw new Exception(String.format("No user with id: %d", userId));
+        else throw new Exception(String.format(errors.getString("invalid_user_id")));
     }
 }

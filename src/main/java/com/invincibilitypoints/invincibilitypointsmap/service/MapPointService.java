@@ -23,10 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class MapPointService {
@@ -35,6 +32,7 @@ public class MapPointService {
     private final UserRepository userRepository;
     private final ResourceRepository resourceRepository;
     private final RatedPointRepository ratedPointRepository;
+    ResourceBundle errors = ResourceBundle.getBundle("errors", new Locale("ua"));
 
     @Autowired
     public MapPointService(PhotoService photoService, MapPointRepository pointRepository,
@@ -66,14 +64,14 @@ public class MapPointService {
         Long userId = createPointRequest.getUserId();
         Optional<User> user = userRepository.findById(userId);
         if (user.isEmpty()) {
-            return ResponseEntity.badRequest().body(new MessageResponse("User id is invalid"));
+            return ResponseEntity.badRequest().body(errors.getString("invalid_user_id"));
         }
 
         Point coordinates = PointConverter.toPoint(createPointRequest.getCoordinates());
 
         if (mapPointRepository.existsMapPointByCoordinates(coordinates)) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(new MessageResponse("Point with the same coordinates already exists"));
+                    .body(new MessageResponse(errors.getString("point_already_exist")));
         }
 
         MapPoint mapPoint = buildMapPoint(createPointRequest, user.get(), coordinates);
@@ -118,9 +116,9 @@ public class MapPointService {
         Optional<MapPoint> pointOptional = mapPointRepository.findById(ratePointRequest.getPointId());
         Optional<User> userOptional = userRepository.findById(ratePointRequest.getUserId());
         if (userOptional.isEmpty())
-            return ResponseEntity.badRequest().body(new MessageResponse("User id is invalid"));
+            return ResponseEntity.badRequest().body(errors.getString("invalid_user_id"));
         else if (pointOptional.isEmpty())
-            return ResponseEntity.badRequest().body(new MessageResponse("Point id is invalid"));
+            return ResponseEntity.badRequest().body(errors.getString("invalid_point_id"));
         else {
             Optional<RatedPoint> ratedPointOptional =
                     ratedPointRepository.findByUserAndPoint(userOptional.get(), pointOptional.get());
@@ -146,9 +144,9 @@ public class MapPointService {
         Optional<MapPoint> pointOptional = mapPointRepository.findById(pointId);
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isEmpty())
-            return ResponseEntity.badRequest().body(new MessageResponse("User id is invalid"));
+            return ResponseEntity.badRequest().body(errors.getString("invalid_user_id"));
         else if (pointOptional.isEmpty())
-            return ResponseEntity.badRequest().body(new MessageResponse("Point id is invalid"));
+            return ResponseEntity.badRequest().body(errors.getString("invalid_point_id"));
         else {
             Optional<RatedPoint> ratedPointOptional =
                     ratedPointRepository.findByUserAndPoint(userOptional.get(), pointOptional.get());
@@ -165,7 +163,7 @@ public class MapPointService {
     public ResponseEntity<?> getPointsByUser(Long userId) {
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isEmpty())
-            return ResponseEntity.badRequest().body(new MessageResponse("User id is invalid"));
+            return ResponseEntity.badRequest().body(errors.getString("invalid_user_id"));
         return ResponseEntity.ok().body(mapPointRepository.findMapPointByUserOwner(userOptional.get()).stream().map(MapPointDto::fromPoint).toList());
     }
 
@@ -173,7 +171,7 @@ public class MapPointService {
     public ResponseEntity<?> deleteMapPoint(Long pointId) {
         Optional<MapPoint> mapPointOptional = mapPointRepository.findById(pointId);
         if (mapPointOptional.isEmpty())
-            return ResponseEntity.badRequest().body(new MessageResponse("Map point id is invalid"));
+            return ResponseEntity.badRequest().body(errors.getString("invalid_point_id"));
         mapPointOptional.get().getResources().forEach(resource -> {
             resource.getPoints().remove(mapPointOptional.get());
             resourceRepository.save(resource);

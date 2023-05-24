@@ -2,6 +2,8 @@ package com.invincibilitypoints.invincibilitypointsmap.security.security.jwt;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 import com.invincibilitypoints.invincibilitypointsmap.security.security.service.UserDetailsImpl;
 import io.jsonwebtoken.security.Keys;
@@ -18,6 +20,7 @@ public class JwtUtils {
     private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
     private final Key key;
     private final int jwtExpirationMs;
+    ResourceBundle errors = ResourceBundle.getBundle("errors", new Locale("ua"));
 
     public JwtUtils(@Value("${jwt_expiration_ms}")int jwtExpirationMs) {
         this.key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
@@ -48,15 +51,15 @@ public class JwtUtils {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(authToken);
             return true;
         } catch (SecurityException e) {
-            logger.error("Invalid JWT signature: {}", e.getMessage());
+            logger.error(errors.getString("invalid_jwt_signature"), e.getMessage());
         } catch (MalformedJwtException e) {
-            logger.error("Invalid JWT token: {}", e.getMessage());
+            logger.error(errors.getString("invalid_jwt_token"), e.getMessage());
         } catch (ExpiredJwtException e) {
-            logger.error("JWT token is expired: {}", e.getMessage());
+            logger.error(errors.getString("jwt_token_expired"), e.getMessage());
         } catch (UnsupportedJwtException e) {
-            logger.error("JWT token is unsupported: {}", e.getMessage());
+            logger.error(errors.getString("unsupported_jwt_token"), e.getMessage());
         } catch (IllegalArgumentException e) {
-            logger.error("JWT claims string is empty: {}", e.getMessage());
+            logger.error(errors.getString("empty_jwt_claims"), e.getMessage());
         }
 
         return false;
@@ -69,7 +72,7 @@ public class JwtUtils {
                 return ResponseEntity.ok().body(email != null);
             }
         } catch (Exception e) {
-            logger.error("Invalid JWT: {}", e.getMessage());
+            logger.error(errors.getString("invalid_jwt_token"), e.getMessage());
         }
         return ResponseEntity.ok().body(false);
     }
