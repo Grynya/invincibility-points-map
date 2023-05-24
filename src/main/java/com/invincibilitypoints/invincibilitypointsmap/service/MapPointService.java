@@ -10,6 +10,7 @@ import com.invincibilitypoints.invincibilitypointsmap.payload.request.CreatePoin
 import com.invincibilitypoints.invincibilitypointsmap.payload.request.PointRequest;
 import com.invincibilitypoints.invincibilitypointsmap.payload.request.RatePointRequest;
 import com.invincibilitypoints.invincibilitypointsmap.payload.response.CreateMapPointResponse;
+import com.invincibilitypoints.invincibilitypointsmap.payload.response.RatingResponse;
 import com.invincibilitypoints.invincibilitypointsmap.repository.MapPointRepository;
 import com.invincibilitypoints.invincibilitypointsmap.repository.RatedPointRepository;
 import com.invincibilitypoints.invincibilitypointsmap.repository.ResourceRepository;
@@ -150,13 +151,18 @@ public class MapPointService {
         else {
             Optional<RatedPoint> ratedPointOptional =
                     ratedPointRepository.findByUserAndPoint(userOptional.get(), pointOptional.get());
+            Integer numOfLikes = ratedPointRepository.countAllByPointAndRating(pointOptional.get(), ERating.LIKED);
+            Integer numOfDislikes = ratedPointRepository.countAllByPointAndRating(pointOptional.get(), ERating.DISLIKED);
+            System.out.println(userOptional.get());
+
+            System.out.println(numOfDislikes);
             return ratedPointOptional
                     .map(ratedPoint -> ResponseEntity
                             .ok()
-                            .body(ratedPoint.getRating()))
+                            .body(new RatingResponse(ratedPointOptional.get().getRating(), numOfLikes, numOfDislikes)))
                     .orElseGet(() -> ResponseEntity
                             .ok()
-                            .body(ERating.NOT_RATED));
+                            .body(new RatingResponse(ERating.NOT_RATED, numOfLikes, numOfDislikes)));
         }
     }
 
