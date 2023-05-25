@@ -30,7 +30,7 @@ public class MapPoint {
 
     private String phone;
 
-    @Column(columnDefinition = "POINT", unique = true)
+    @Column(columnDefinition = "POINT")
     private Point coordinates;
 
     @OneToMany(mappedBy = "point")
@@ -45,5 +45,6 @@ public class MapPoint {
 
     @OneToMany(mappedBy = "point")
     private Set<RatedPoint> usersWhoRated;
-
+    @Column(columnDefinition = "boolean default false")
+    private Boolean isDeleted;
 }

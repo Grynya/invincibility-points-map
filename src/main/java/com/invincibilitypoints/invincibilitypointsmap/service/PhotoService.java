@@ -59,8 +59,4 @@ public class PhotoService {
                     .body(errors.getString("error_uploading_photo"));
         }
     }
-
-    public void deleteByMapPoint(MapPoint mapPoint) {
-        photoRepository.deleteByPoint(mapPoint);
-    }
 }

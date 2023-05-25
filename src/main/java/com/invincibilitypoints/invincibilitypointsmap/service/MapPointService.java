@@ -4,8 +4,8 @@ import com.invincibilitypoints.invincibilitypointsmap.converters.PointConverter;
 import com.invincibilitypoints.invincibilitypointsmap.dto.MapPointDto;
 import com.invincibilitypoints.invincibilitypointsmap.enums.ERating;
 import com.invincibilitypoints.invincibilitypointsmap.model.MapPoint;
-import com.invincibilitypoints.invincibilitypointsmap.model.Resource;
 import com.invincibilitypoints.invincibilitypointsmap.model.RatedPoint;
+import com.invincibilitypoints.invincibilitypointsmap.model.Resource;
 import com.invincibilitypoints.invincibilitypointsmap.payload.request.CreatePointRequest;
 import com.invincibilitypoints.invincibilitypointsmap.payload.request.PointRequest;
 import com.invincibilitypoints.invincibilitypointsmap.payload.request.RatePointRequest;
@@ -15,7 +15,6 @@ import com.invincibilitypoints.invincibilitypointsmap.repository.MapPointReposit
 import com.invincibilitypoints.invincibilitypointsmap.repository.RatedPointRepository;
 import com.invincibilitypoints.invincibilitypointsmap.repository.ResourceRepository;
 import com.invincibilitypoints.invincibilitypointsmap.security.model.User;
-import com.invincibilitypoints.invincibilitypointsmap.security.payload.response.MessageResponse;
 import com.invincibilitypoints.invincibilitypointsmap.security.repository.UserRepository;
 import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +27,6 @@ import java.util.*;
 
 @Service
 public class MapPointService {
-    private final PhotoService photoService;
     private final MapPointRepository mapPointRepository;
     private final UserRepository userRepository;
     private final ResourceRepository resourceRepository;
@@ -36,11 +34,10 @@ public class MapPointService {
     ResourceBundle errors = ResourceBundle.getBundle("errors", new Locale("ua"));
 
     @Autowired
-    public MapPointService(PhotoService photoService, MapPointRepository pointRepository,
+    public MapPointService(MapPointRepository pointRepository,
                            UserRepository userRepository,
                            ResourceRepository resourceRepository,
                            RatedPointRepository ratedPointRepository) {
-        this.photoService = photoService;
         this.mapPointRepository = pointRepository;
         this.userRepository = userRepository;
         this.resourceRepository = resourceRepository;
@@ -70,14 +67,13 @@ public class MapPointService {
 
         Point coordinates = PointConverter.toPoint(createPointRequest.getCoordinates());
 
-        if (mapPointRepository.existsMapPointByCoordinates(coordinates)) {
+        if (mapPointRepository.existsMapPointByCoordinatesAndIsDeleted(coordinates, false)) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(new MessageResponse(errors.getString("point_already_exist")));
+                    .body(errors.getString("point_already_exist"));
         }
 
         MapPoint mapPoint = buildMapPoint(createPointRequest, user.get(), coordinates);
 
-        // Connect the resources to the map point
         Set<Resource> resources = new HashSet<>();
         for (Resource resource : createPointRequest.getResources()) {
             Optional<Resource> savedResource = resourceRepository.findById(resource.getId());
@@ -102,6 +98,7 @@ public class MapPointService {
                 .coordinates(coordinates)
                 .usersWhoRated(new HashSet<>())
                 .userOwner(user)
+                .isDeleted(false)
                 .build();
     }
 
@@ -153,9 +150,7 @@ public class MapPointService {
                     ratedPointRepository.findByUserAndPoint(userOptional.get(), pointOptional.get());
             Integer numOfLikes = ratedPointRepository.countAllByPointAndRating(pointOptional.get(), ERating.LIKED);
             Integer numOfDislikes = ratedPointRepository.countAllByPointAndRating(pointOptional.get(), ERating.DISLIKED);
-            System.out.println(userOptional.get());
 
-            System.out.println(numOfDislikes);
             return ratedPointOptional
                     .map(ratedPoint -> ResponseEntity
                             .ok()
@@ -170,21 +165,14 @@ public class MapPointService {
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isEmpty())
             return ResponseEntity.badRequest().body(errors.getString("invalid_user_id"));
-        return ResponseEntity.ok().body(mapPointRepository.findMapPointByUserOwner(userOptional.get()).stream().map(MapPointDto::fromPoint).toList());
+        return ResponseEntity.ok().body(mapPointRepository.findMapPointByUserOwnerAndIsDeleted(userOptional.get(), false).stream().map(MapPointDto::fromPoint).toList());
     }
 
-    @Transactional
     public ResponseEntity<?> deleteMapPoint(Long pointId) {
         Optional<MapPoint> mapPointOptional = mapPointRepository.findById(pointId);
-        if (mapPointOptional.isEmpty())
-            return ResponseEntity.badRequest().body(errors.getString("invalid_point_id"));
-        mapPointOptional.get().getResources().forEach(resource -> {
-            resource.getPoints().remove(mapPointOptional.get());
-            resourceRepository.save(resource);
-        });
-        ratedPointRepository.deleteByPoint(mapPointOptional.get());
-        photoService.deleteByMapPoint(mapPointOptional.get());
-        mapPointRepository.delete(mapPointOptional.get());
+        if (mapPointOptional.isEmpty()) return ResponseEntity.badRequest().body(errors.getString("invalid_point_id"));
+        mapPointOptional.get().setIsDeleted(true);
+        mapPointRepository.save(mapPointOptional.get());
         return ResponseEntity.ok().build();
     }
 }

@@ -14,7 +14,4 @@ public interface RatedPointRepository extends JpaRepository<RatedPoint, Long> {
     Optional<RatedPoint> findByUserAndPoint(User user, MapPoint point);
 
     Integer countAllByPointAndRating (MapPoint mapPoint, ERating eRating);
-
-    void deleteByPoint(MapPoint point);
-
 }
