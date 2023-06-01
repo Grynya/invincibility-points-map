@@ -1,7 +1,7 @@
 package com.invincibilitypoints.invincibilitypointsmap.payload.request;
 
 import com.invincibilitypoints.invincibilitypointsmap.dto.PointDto;
-import com.invincibilitypoints.invincibilitypointsmap.model.Resource;
+import com.invincibilitypoints.invincibilitypointsmap.dto.ResourceDto;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,6 +21,6 @@ public class CreatePointRequest {
     private String hoursOfWork;
     @NotNull
     private PointDto coordinates;
-    private Set<Resource> resources;
+    private Set<ResourceDto> resources;
     private Long userId;
 }

@@ -1,6 +1,5 @@
 package com.invincibilitypoints.invincibilitypointsmap.service;
 
-import com.invincibilitypoints.invincibilitypointsmap.dto.ErrorResponse;
 import com.invincibilitypoints.invincibilitypointsmap.dto.MapPointDto;
 import com.invincibilitypoints.invincibilitypointsmap.dto.UserDto;
 import com.invincibilitypoints.invincibilitypointsmap.enums.ERating;
@@ -22,7 +21,7 @@ import com.invincibilitypoints.invincibilitypointsmap.security.payload.response.
 import com.invincibilitypoints.invincibilitypointsmap.security.payload.response.MessageResponse;
 import com.invincibilitypoints.invincibilitypointsmap.security.repository.RoleRepository;
 import com.invincibilitypoints.invincibilitypointsmap.security.repository.UserRepository;
-import com.invincibilitypoints.invincibilitypointsmap.security.repository.VerificationTokenRepository;
+import com.invincibilitypoints.invincibilitypointsmap.repository.VerificationTokenRepository;
 import com.invincibilitypoints.invincibilitypointsmap.security.security.jwt.JwtUtils;
 import com.invincibilitypoints.invincibilitypointsmap.security.security.service.RefreshTokenService;
 import com.invincibilitypoints.invincibilitypointsmap.security.security.service.UserDetailsImpl;
@@ -43,7 +42,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.ResourceBundle;
 
 @Service
 public class UserService {
@@ -92,7 +90,7 @@ public class UserService {
         if (userDetails.getUserStatus().equals(EStatus.INACTIVE)) {
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
-                    .body(new ErrorResponse(errors.getString("inactive_user")));
+                    .body(new MessageResponse(errors.getString("inactive_user")));
         }
 
         String jwt = jwtUtils.generateJwtToken(userDetails);

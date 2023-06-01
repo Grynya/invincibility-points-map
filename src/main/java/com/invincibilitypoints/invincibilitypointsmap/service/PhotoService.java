@@ -4,7 +4,6 @@ import com.invincibilitypoints.invincibilitypointsmap.model.MapPoint;
 import com.invincibilitypoints.invincibilitypointsmap.model.PointPhoto;
 import com.invincibilitypoints.invincibilitypointsmap.repository.MapPointRepository;
 import com.invincibilitypoints.invincibilitypointsmap.repository.PhotoRepository;
-import com.invincibilitypoints.invincibilitypointsmap.util.LocationUriBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -12,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.*;
 
 @Service
@@ -49,9 +47,7 @@ public class PhotoService {
                 mapPointOwnerOfPhotos.get().setPhotos(allPhotos);
                 mapPointRepository.save(mapPointOwnerOfPhotos.get());
 
-                URI location = LocationUriBuilder.build(mapPointId);
-
-                return ResponseEntity.created(location).build();
+                return ResponseEntity.ok().build();
             }
         } catch (IOException e) {
             return ResponseEntity

@@ -20,10 +20,10 @@ public class MapPointController {
         this.mapPointService = pointService;
     }
 
-    @GetMapping("/point/{mapPointId}")
-    public ResponseEntity<?> getMapPointById(@Valid @PathVariable Long mapPointId) {
-        return mapPointService.getMapPointById(mapPointId);
-    }
+//    @GetMapping("/point/{mapPointId}")
+//    public ResponseEntity<?> getMapPointById(@Valid @PathVariable Long mapPointId) {
+//        return mapPointService.getMapPointById(mapPointId);
+//    }
     @PostMapping("/public/point/getAll")
     public ResponseEntity<?> getPoints(@Valid @RequestBody PointRequest pointRequest) {
         return mapPointService.filterPointsInBounds(pointRequest);
@@ -41,8 +41,9 @@ public class MapPointController {
         return mapPointService.ratePoint(ratePointRequest);
     }
     @GetMapping("/point/getRating")
-    public ResponseEntity<?> getRatingOfPoint(@Valid @RequestParam Long pointId, @Valid @RequestParam Long userId) {
-        return mapPointService.getRatingOfPoint(pointId, userId);
+    public ResponseEntity<?> getRatingOfPoint(@Valid @RequestParam Long mapPointId,
+                                              @Valid @RequestParam Long userId) {
+        return mapPointService.getRatingOfPoint(mapPointId, userId);
     }
 
     @DeleteMapping("/admin/point")

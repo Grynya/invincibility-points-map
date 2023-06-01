@@ -1,4 +1,4 @@
-package com.invincibilitypoints.invincibilitypointsmap.security.repository;
+package com.invincibilitypoints.invincibilitypointsmap.repository;
 
 import com.invincibilitypoints.invincibilitypointsmap.security.model.VerificationToken;
 import org.springframework.data.jpa.repository.JpaRepository;

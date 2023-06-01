@@ -1,6 +1,7 @@
 package com.invincibilitypoints.invincibilitypointsmap.service;
 
-import com.invincibilitypoints.invincibilitypointsmap.converters.PointConverter;
+import com.invincibilitypoints.invincibilitypointsmap.dto.PointDto;
+import com.invincibilitypoints.invincibilitypointsmap.dto.ResourceDto;
 import com.invincibilitypoints.invincibilitypointsmap.dto.MapPointDto;
 import com.invincibilitypoints.invincibilitypointsmap.enums.ERating;
 import com.invincibilitypoints.invincibilitypointsmap.model.MapPoint;
@@ -16,6 +17,8 @@ import com.invincibilitypoints.invincibilitypointsmap.repository.RatedPointRepos
 import com.invincibilitypoints.invincibilitypointsmap.repository.ResourceRepository;
 import com.invincibilitypoints.invincibilitypointsmap.security.model.User;
 import com.invincibilitypoints.invincibilitypointsmap.security.repository.UserRepository;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -65,7 +68,7 @@ public class MapPointService {
             return ResponseEntity.badRequest().body(errors.getString("invalid_user_id"));
         }
 
-        Point coordinates = PointConverter.toPoint(createPointRequest.getCoordinates());
+        Point coordinates = toPoint(createPointRequest.getCoordinates());
 
         if (mapPointRepository.existsMapPointByCoordinatesAndIsDeleted(coordinates, false)) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
@@ -75,11 +78,11 @@ public class MapPointService {
         MapPoint mapPoint = buildMapPoint(createPointRequest, user.get(), coordinates);
 
         Set<Resource> resources = new HashSet<>();
-        for (Resource resource : createPointRequest.getResources()) {
-            Optional<Resource> savedResource = resourceRepository.findById(resource.getId());
+        for (ResourceDto resource : createPointRequest.getResources()) {
+            Optional<Resource> savedResource = resourceRepository.findById(resource.id());
             if (savedResource.isPresent()) {
                 savedResource.get().getPoints().add(mapPoint);
-                resources.add(resource);
+                resources.add(savedResource.get());
             }
         }
         mapPoint.setResources(resources);
@@ -100,14 +103,6 @@ public class MapPointService {
                 .userOwner(user)
                 .isDeleted(false)
                 .build();
-    }
-
-    public ResponseEntity<?> getMapPointById(Long mapPointId) {
-        Optional<MapPoint> mapPointOptional = mapPointRepository.findById(mapPointId);
-        if (mapPointOptional.isPresent()) {
-            MapPoint mapPoint = mapPointOptional.get();
-            return ResponseEntity.ok(MapPointDto.fromPoint(mapPoint));
-        } else return ResponseEntity.notFound().build();
     }
 
     public ResponseEntity<?> ratePoint(RatePointRequest ratePointRequest) {
@@ -174,5 +169,11 @@ public class MapPointService {
         mapPointOptional.get().setIsDeleted(true);
         mapPointRepository.save(mapPointOptional.get());
         return ResponseEntity.ok().build();
+    }
+
+    private Point toPoint(PointDto coordinatesDto) {
+        GeometryFactory geometryFactory = new GeometryFactory();
+        Coordinate coordinate = new Coordinate(coordinatesDto.lat(), coordinatesDto.lng());
+        return geometryFactory.createPoint(coordinate);
     }
 }

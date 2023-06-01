@@ -8,41 +8,26 @@ import org.locationtech.jts.geom.Point;
 
 import java.util.Set;
 
-@Entity
-@Getter
-@Setter
+@Entity @Table
+@Getter @Setter @ToString
 @Builder(toBuilder = true)
-@NoArgsConstructor
-@AllArgsConstructor
-@Table
-@ToString
+@NoArgsConstructor @AllArgsConstructor
 public class MapPoint {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @NotNull
     private String name;
-
     private String description;
-
     private String hoursOfWork;
-
     private String phone;
-
     @Column(columnDefinition = "POINT")
     private Point coordinates;
-
     @OneToMany(mappedBy = "point")
     private Set<PointPhoto> photos;
-
-    @ManyToOne
-    @JoinColumn(name = "user_owner", nullable = false)
+    @ManyToOne @JoinColumn(name = "user_owner", nullable = false)
     private User userOwner;
-
     @ManyToMany(mappedBy = "points")
     Set<Resource> resources;
-
     @OneToMany(mappedBy = "point")
     private Set<RatedPoint> usersWhoRated;
     @Column(columnDefinition = "boolean default false")
