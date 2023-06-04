@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+  inv-map-db:
+    image: mysql:8.0.33
+    container_name: inv-map-db
+    healthcheck:
+      test: ["CMD", 'mysqladmin', 'ping', '-h', 'localhost', '-u', 'scm', '-pscm' ]
+      interval: 3s
+      retries: 120
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: invPointMap
+      MYSQL_USER: invPointMap
+      MYSQL_PASSWORD: invPointMap
+    ports:
+      - "3326:3306"
+    networks:
+      - database-compose
+
+  inv-map:
+    image: 565106251181.dkr.ecr.eu-central-1.amazonaws.com/invmap:1
+    depends_on:
+      inv-map-db:
+        condition: service_healthy
+    container_name: inv-map-backend
+    ports:
+      - "8084:8080"
+    networks:
+      - database-compose
+
+networks:
+  database-compose:

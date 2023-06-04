@@ -2,7 +2,7 @@ package com.invincibilitypoints.invincibilitypointsmap.listeners;
 
 import com.invincibilitypoints.invincibilitypointsmap.events.OnRegistrationCompleteEvent;
 import com.invincibilitypoints.invincibilitypointsmap.security.model.User;
-import com.invincibilitypoints.invincibilitypointsmap.service.UserService;
+import com.invincibilitypoints.invincibilitypointsmap.service.AuthService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,14 +24,14 @@ import java.util.UUID;
 public class RegistrationListener implements
         ApplicationListener<OnRegistrationCompleteEvent> {
 
-    private final UserService userService;
+    private final AuthService authService;
 
     private final JavaMailSender mailSender;
     ResourceBundle messages = ResourceBundle.getBundle("messages", new Locale("ua"));
 
     @Autowired
-    public RegistrationListener(UserService userService, JavaMailSender mailSender) {
-        this.userService = userService;
+    public RegistrationListener(AuthService authService, JavaMailSender mailSender) {
+        this.authService = authService;
         this.mailSender = mailSender;
     }
 
@@ -47,7 +47,7 @@ public class RegistrationListener implements
     private void confirmRegistration(OnRegistrationCompleteEvent event) throws MessagingException, IOException {
         User user = event.getUser();
         String token = UUID.randomUUID().toString();
-        userService.createVerificationToken(user, token);
+        authService.createVerificationToken(user, token);
 
         String recipientAddress = user.getEmail();
         String subject = "Мапа пунктів незламності";

@@ -5,116 +5,52 @@ import com.invincibilitypoints.invincibilitypointsmap.dto.UserDto;
 import com.invincibilitypoints.invincibilitypointsmap.enums.ERating;
 import com.invincibilitypoints.invincibilitypointsmap.enums.ERole;
 import com.invincibilitypoints.invincibilitypointsmap.enums.EStatus;
-import com.invincibilitypoints.invincibilitypointsmap.enums.ETokenVerificationStatus;
 import com.invincibilitypoints.invincibilitypointsmap.events.OnPasswordRecoveryEvent;
 import com.invincibilitypoints.invincibilitypointsmap.events.OnRegistrationCompleteEvent;
 import com.invincibilitypoints.invincibilitypointsmap.model.MapPoint;
 import com.invincibilitypoints.invincibilitypointsmap.model.RatedPoint;
-import com.invincibilitypoints.invincibilitypointsmap.payload.response.TokenVerificationResponse;
-import com.invincibilitypoints.invincibilitypointsmap.security.model.RefreshToken;
 import com.invincibilitypoints.invincibilitypointsmap.security.model.Role;
 import com.invincibilitypoints.invincibilitypointsmap.security.model.User;
-import com.invincibilitypoints.invincibilitypointsmap.security.model.VerificationToken;
-import com.invincibilitypoints.invincibilitypointsmap.security.payload.request.LoginRequest;
 import com.invincibilitypoints.invincibilitypointsmap.security.payload.request.SignupRequest;
-import com.invincibilitypoints.invincibilitypointsmap.security.payload.response.JwtResponse;
 import com.invincibilitypoints.invincibilitypointsmap.security.payload.response.MessageResponse;
 import com.invincibilitypoints.invincibilitypointsmap.security.repository.RoleRepository;
 import com.invincibilitypoints.invincibilitypointsmap.security.repository.UserRepository;
-import com.invincibilitypoints.invincibilitypointsmap.repository.VerificationTokenRepository;
 import com.invincibilitypoints.invincibilitypointsmap.security.security.jwt.JwtUtils;
-import com.invincibilitypoints.invincibilitypointsmap.security.security.service.RefreshTokenService;
-import com.invincibilitypoints.invincibilitypointsmap.security.security.service.UserDetailsImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class UserService {
-    private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder encoder;
     private final ApplicationEventPublisher eventPublisher;
-    private final VerificationTokenRepository verificationTokenRepository;
-    private final RefreshTokenService refreshTokenService;
     private final HttpServletRequest request;
     ResourceBundle errors = ResourceBundle.getBundle("errors", new Locale("ua"));
     @Value("${jwt_expiration_ms}")
     int jwtExpirationMs;
 
     @Autowired
-    public UserService(AuthenticationManager authenticationManager,
-                       JwtUtils jwtUtils,
+    public UserService(JwtUtils jwtUtils,
                        UserRepository userRepository,
                        RoleRepository roleRepository,
                        PasswordEncoder encoder,
-                       ApplicationEventPublisher eventPublisher,
-                       VerificationTokenRepository verificationTokenRepository,
-                       RefreshTokenService refreshTokenService, HttpServletRequest request) {
-        this.authenticationManager = authenticationManager;
+                       ApplicationEventPublisher eventPublisher, HttpServletRequest request) {
         this.jwtUtils = jwtUtils;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.encoder = encoder;
         this.eventPublisher = eventPublisher;
-        this.verificationTokenRepository = verificationTokenRepository;
-        this.refreshTokenService = refreshTokenService;
         this.request = request;
-    }
-
-    public ResponseEntity<?> authenticateUserWithCredentials(LoginRequest loginRequest) {
-        Authentication authentication = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(
-                        loginRequest.getUsername(), loginRequest.getPassword()));
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
-        if (userDetails.getUserStatus().equals(EStatus.INACTIVE)) {
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body(new MessageResponse(errors.getString("inactive_user")));
-        }
-
-        String jwt = jwtUtils.generateJwtToken(userDetails);
-
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
-
-        return ResponseEntity.ok(new JwtResponse(jwt, jwtExpirationMs, refreshToken.getToken(), userDetails.getId(),
-                userDetails.getName(), userDetails.getSurname(), userDetails.getEmail(),
-                userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet())));
-    }
-
-    public JwtResponse generateTokens(User user) {
-
-        String jwt = jwtUtils.generateTokenFromEmail(user.getEmail());
-
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
-
-        return new JwtResponse(jwt, jwtExpirationMs, refreshToken.getToken(), user.getId(),
-                user.getEmail(), user.getSurname(), user.getEmail(),
-                user
-                        .getRoles()
-                        .stream()
-                        .map(role -> role.getName().name())
-                        .collect(Collectors.toSet()));
     }
 
     @Transactional
@@ -147,9 +83,6 @@ public class UserService {
         String appUrl = request.getHeader("Host");
         eventPublisher.publishEvent(new OnRegistrationCompleteEvent(registered,
                 request.getLocale(), appUrl));
-//        String appUrl = request.getHeader("Host");
-//        eventPublisher.publishEvent(new OnRegistrationCompleteEvent(userRepository.findByEmail("hrynenko.anastasia@gmail.com").get(),
-//                request.getLocale(), appUrl));
         return ResponseEntity.ok().build();
     }
 
@@ -166,33 +99,6 @@ public class UserService {
         return ResponseEntity.badRequest().body(new MessageResponse(errors.getString("invalid_user_id")));
     }
 
-    public void createVerificationToken(User user, String token) {
-        VerificationToken myToken = new VerificationToken(token, user);
-        verificationTokenRepository.save(myToken);
-    }
-
-    public TokenVerificationResponse validateVerificationToken(String token) {
-        final Optional<VerificationToken> verificationTokenOptional = verificationTokenRepository.findByToken(token);
-        if (verificationTokenOptional.isPresent()) {
-            VerificationToken verificationToken = verificationTokenOptional.get();
-
-            final User user = verificationToken.getUser();
-            final Calendar cal = Calendar.getInstance();
-            if ((verificationToken.getExpiryDate()
-                    .getTime() - cal.getTime()
-                    .getTime()) <= 0) {
-                verificationTokenRepository.delete(verificationToken);
-                return new TokenVerificationResponse(ETokenVerificationStatus.TOKEN_EXPIRED, null);
-            }
-
-            user.setUserStatus(EStatus.ACTIVE);
-            verificationTokenRepository.delete(verificationToken);
-            userRepository.save(user);
-            JwtResponse responseEntity = generateTokens(user);
-            return new TokenVerificationResponse(ETokenVerificationStatus.TOKEN_VALID, responseEntity);
-        }
-        return new TokenVerificationResponse(ETokenVerificationStatus.TOKEN_INVALID, null);
-    }
 
     public ResponseEntity<?> getUserInfoByAccessToken(String accessToken) {
         String username = jwtUtils.getEmailFromJwtToken(accessToken);
@@ -223,7 +129,6 @@ public class UserService {
             return ResponseEntity.badRequest().body(new MessageResponse(errors.getString("invalid_user_email")));
         }
         String appUrl = request.getContextPath();
-        System.out.println("service");
         eventPublisher.publishEvent(new OnPasswordRecoveryEvent(optionalUser.get(),
                 request.getLocale(), appUrl));
         return ResponseEntity.ok().build();
@@ -264,20 +169,6 @@ public class UserService {
             }
         } else {
             return ResponseEntity.badRequest().body(new MessageResponse(errors.getString("invalid_user_email")));
-        }
-    }
-
-    public ResponseEntity<?> logout(){
-        try {
-            UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder
-                    .getContext()
-                    .getAuthentication()
-                    .getPrincipal();
-            Long userId = userDetails.getId();
-            refreshTokenService.deleteByUserId(userId);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new MessageResponse(e.getMessage()));
         }
     }
 

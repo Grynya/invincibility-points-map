@@ -3,27 +3,26 @@
   <ID>JAVA</ID>
   <OriginalElement />
   <nodes>
-    <node x="-68.5" y="542.0">com.invincibilitypoints.invincibilitypointsmap.security.repository.UserRepository</node>
-    <node x="70.5" y="1113.0">com.invincibilitypoints.invincibilitypointsmap.security.security.jwt.AuthEntryPointJwt</node>
-    <node x="-359.5" y="1102.0">com.invincibilitypoints.invincibilitypointsmap.security.security.jwt.AuthTokenFilter</node>
-    <node x="-40.0" y="913.0">com.invincibilitypoints.invincibilitypointsmap.security.security.service.UserDetailsServiceImpl</node>
-    <node x="197.5" y="398.5">com.invincibilitypoints.invincibilitypointsmap.security.security.service.UserDetailsImpl</node>
-    <node x="-354.5" y="869.0">com.invincibilitypoints.invincibilitypointsmap.security.security.jwt.JwtUtils</node>
-    <node x="266.5" y="913.0">com.invincibilitypoints.invincibilitypointsmap.security.repository.RoleRepository</node>
-    <node x="-276.0" y="1269.0">com.invincibilitypoints.invincibilitypointsmap.security.security.WebSecurityConfig</node>
+    <node x="-40.0" y="907.0">com.invincibilitypoints.invincibilitypointsmap.security.security.service.UserDetailsServiceImpl</node>
+    <node x="317.5" y="352.5">com.invincibilitypoints.invincibilitypointsmap.security.security.service.UserDetailsImpl</node>
+    <node x="90.5" y="1147.0">com.invincibilitypoints.invincibilitypointsmap.security.security.jwt.AuthEntryPointJwt</node>
+    <node x="281.0" y="819.0">com.invincibilitypoints.invincibilitypointsmap.security.security.service.UserDetailsImpl.UserDetailsImplBuilder</node>
+    <node x="-354.5" y="863.0">com.invincibilitypoints.invincibilitypointsmap.security.security.jwt.JwtUtils</node>
+    <node x="-276.0" y="1303.0">com.invincibilitypoints.invincibilitypointsmap.security.security.WebSecurityConfig</node>
+    <node x="210.5" y="1347.0">com.invincibilitypoints.invincibilitypointsmap.security.repository.RoleRepository</node>
+    <node x="-359.5" y="1136.0">com.invincibilitypoints.invincibilitypointsmap.security.security.jwt.AuthTokenFilter</node>
+    <node x="-28.5" y="496.0">com.invincibilitypoints.invincibilitypointsmap.security.repository.UserRepository</node>
   </nodes>
   <notes />
   <edges>
     <edge source="com.invincibilitypoints.invincibilitypointsmap.security.security.WebSecurityConfig" target="com.invincibilitypoints.invincibilitypointsmap.security.security.service.UserDetailsServiceImpl" relationship="TO_ONE">
       <point x="120.0" y="-71.0" />
-      <point x="72.0" y="1200.0" />
-      <point x="52.0" y="1200.0" />
-      <point x="-40.0" y="27.0" />
+      <point x="-20.0" y="27.0" />
     </edge>
     <edge source="com.invincibilitypoints.invincibilitypointsmap.security.security.jwt.AuthTokenFilter" target="com.invincibilitypoints.invincibilitypointsmap.security.security.jwt.JwtUtils" relationship="TO_ONE">
       <point x="0.0" y="-38.0" />
-      <point x="-168.0" y="1080.0" />
-      <point x="-208.0" y="1080.0" />
+      <point x="-168.0" y="1114.0" />
+      <point x="-208.0" y="1114.0" />
       <point x="0.0" y="71.0" />
     </edge>
     <edge source="com.invincibilitypoints.invincibilitypointsmap.security.security.WebSecurityConfig" target="com.invincibilitypoints.invincibilitypointsmap.security.security.jwt.AuthTokenFilter" relationship="CREATE">
@@ -31,27 +30,32 @@
       <point x="0.0" y="38.0" />
     </edge>
     <edge source="com.invincibilitypoints.invincibilitypointsmap.security.security.service.UserDetailsServiceImpl" target="com.invincibilitypoints.invincibilitypointsmap.security.repository.UserRepository" relationship="TO_ONE">
-      <point x="-40.0" y="-27.0" />
+      <point x="0.0" y="-27.0" />
       <point x="0.0" y="38.0" />
-    </edge>
-    <edge source="com.invincibilitypoints.invincibilitypointsmap.security.security.jwt.AuthTokenFilter" target="com.invincibilitypoints.invincibilitypointsmap.security.security.service.UserDetailsServiceImpl" relationship="TO_ONE">
-      <point x="0.0" y="-38.0" />
-      <point x="-168.0" y="1060.0" />
-      <point x="52.0" y="1060.0" />
-      <point x="-40.0" y="27.0" />
     </edge>
     <edge source="com.invincibilitypoints.invincibilitypointsmap.security.security.WebSecurityConfig" target="com.invincibilitypoints.invincibilitypointsmap.security.security.jwt.AuthEntryPointJwt" relationship="TO_ONE">
       <point x="120.0" y="-71.0" />
-      <point x="72.0" y="1200.0" />
-      <point x="92.0" y="1200.0" />
+      <point x="72.0" y="1274.0" />
+      <point x="112.0" y="1274.0" />
       <point x="-180.0" y="27.0" />
     </edge>
+    <edge source="com.invincibilitypoints.invincibilitypointsmap.security.security.jwt.AuthTokenFilter" target="com.invincibilitypoints.invincibilitypointsmap.security.security.service.UserDetailsServiceImpl" relationship="TO_ONE">
+      <point x="0.0" y="-38.0" />
+      <point x="-168.0" y="1094.0" />
+      <point x="72.0" y="1094.0" />
+      <point x="-20.0" y="27.0" />
+    </edge>
+    <edge source="com.invincibilitypoints.invincibilitypointsmap.security.security.service.UserDetailsImpl.UserDetailsImplBuilder" target="com.invincibilitypoints.invincibilitypointsmap.security.security.service.UserDetailsImpl" relationship="INNER_CLASS">
+      <point x="-28.0" y="-115.0" />
+      <point x="-0.0" y="181.5" />
+    </edge>
   </edges>
-  <settings layout="Hierarchic Compact" zoom="1.1839303000968053" showDependencies="true" x="67.0" y="914.5" />
+  <settings layout="Hierarchic Compact" zoom="0.9495635305528612" showDependencies="true" x="155.5" y="908.5" />
   <SelectedNodes>
-    <node>com.invincibilitypoints.invincibilitypointsmap.security.repository.RoleRepository</node>
+    <node>com.invincibilitypoints.invincibilitypointsmap.security.security.service.UserDetailsImpl.UserDetailsImplBuilder</node>
   </SelectedNodes>
   <Categories>
+    <Category>Inner Classes</Category>
     <Category>Methods</Category>
     <Category>Properties</Category>
   </Categories>

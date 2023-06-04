@@ -1,4 +1,4 @@
-package com.invincibilitypoints.invincibilitypointsmap.security.repository;
+package com.invincibilitypoints.invincibilitypointsmap.repository;
 
 import com.invincibilitypoints.invincibilitypointsmap.security.model.RefreshToken;
 import com.invincibilitypoints.invincibilitypointsmap.security.model.User;
