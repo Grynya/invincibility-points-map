@@ -15,7 +15,6 @@ import com.invincibilitypoints.invincibilitypointsmap.security.payload.request.S
 import com.invincibilitypoints.invincibilitypointsmap.security.payload.response.MessageResponse;
 import com.invincibilitypoints.invincibilitypointsmap.security.repository.RoleRepository;
 import com.invincibilitypoints.invincibilitypointsmap.security.repository.UserRepository;
-import com.invincibilitypoints.invincibilitypointsmap.security.security.jwt.JwtUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,7 +28,6 @@ import java.util.*;
 
 @Service
 public class UserService {
-    private final JwtUtils jwtUtils;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder encoder;
@@ -40,12 +38,11 @@ public class UserService {
     int jwtExpirationMs;
 
     @Autowired
-    public UserService(JwtUtils jwtUtils,
-                       UserRepository userRepository,
+    public UserService(UserRepository userRepository,
                        RoleRepository roleRepository,
                        PasswordEncoder encoder,
-                       ApplicationEventPublisher eventPublisher, HttpServletRequest request) {
-        this.jwtUtils = jwtUtils;
+                       ApplicationEventPublisher eventPublisher,
+                       HttpServletRequest request) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.encoder = encoder;
@@ -97,15 +94,6 @@ public class UserService {
             return ResponseEntity.ok().body(pointDtos);
         }
         return ResponseEntity.badRequest().body(new MessageResponse(errors.getString("invalid_user_id")));
-    }
-
-
-    public ResponseEntity<?> getUserInfoByAccessToken(String accessToken) {
-        String username = jwtUtils.getEmailFromJwtToken(accessToken);
-        Optional<User> user = userRepository.findByEmail(username);
-        if (user.isEmpty())
-            return ResponseEntity.badRequest().body(new MessageResponse(errors.getString("invalid_user_id")));
-        return ResponseEntity.ok(UserDto.fromUser(user.get()));
     }
 
     public ResponseEntity<?> getLikedPoints(Long userId) {

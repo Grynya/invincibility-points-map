@@ -42,10 +42,7 @@ public class UserController {
     public ResponseEntity<?> getPoints(@Valid @RequestParam Long id) {
         return userService.getPoints(id);
     }
-    @GetMapping("/user/info-by-access-token")
-    public ResponseEntity<?> getUserInfoByAccessToken(@Valid @RequestParam String accessToken) {
-        return userService.getUserInfoByAccessToken(accessToken);
-    }
+
     @GetMapping("/admin/getAllUsers")
     public ResponseEntity<?> getAllUsers() {
         return userService.getAllUsers();

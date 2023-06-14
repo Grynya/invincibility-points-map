@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement />
+  <nodes>
+    <node x="-1078.0" y="520.0">com.invincibilitypoints.invincibilitypointsmap.repository.MapPointRepository</node>
+    <node x="-919.0" y="802.0">com.invincibilitypoints.invincibilitypointsmap.service.PhotoService</node>
+    <node x="-1348.5" y="531.0">com.invincibilitypoints.invincibilitypointsmap.security.repository.UserRepository</node>
+    <node x="-388.5" y="542.0">com.invincibilitypoints.invincibilitypointsmap.service.KeysService</node>
+    <node x="-1392.0" y="1047.0">com.invincibilitypoints.invincibilitypointsmap.controller.MapPointController</node>
+    <node x="-1753.5" y="531.0">com.invincibilitypoints.invincibilitypointsmap.repository.RatedPointRepository</node>
+    <node x="-919.0" y="1102.0">com.invincibilitypoints.invincibilitypointsmap.controller.PhotoController</node>
+    <node x="-1961.5" y="542.0">com.invincibilitypoints.invincibilitypointsmap.repository.ResourceRepository</node>
+    <node x="-1474.0" y="714.0">com.invincibilitypoints.invincibilitypointsmap.service.MapPointService</node>
+    <node x="-1959.5" y="802.0">com.invincibilitypoints.invincibilitypointsmap.service.ResourceService</node>
+    <node x="-587.0" y="554.5">com.invincibilitypoints.invincibilitypointsmap.repository.PhotoRepository</node>
+    <node x="-1959.5" y="1102.0">com.invincibilitypoints.invincibilitypointsmap.controller.ResourceController</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="com.invincibilitypoints.invincibilitypointsmap.controller.PhotoController" target="com.invincibilitypoints.invincibilitypointsmap.service.PhotoService" relationship="TO_ONE">
+      <point x="0.0" y="-27.0" />
+      <point x="0.0" y="27.0" />
+    </edge>
+    <edge source="com.invincibilitypoints.invincibilitypointsmap.service.MapPointService" target="com.invincibilitypoints.invincibilitypointsmap.repository.MapPointRepository" relationship="TO_ONE">
+      <point x="0.0" y="-115.0" />
+      <point x="-1228.0" y="669.0" />
+      <point x="-848.0" y="669.0" />
+      <point x="0.0" y="49.0" />
+    </edge>
+    <edge source="com.invincibilitypoints.invincibilitypointsmap.service.MapPointService" target="com.invincibilitypoints.invincibilitypointsmap.repository.RatedPointRepository" relationship="TO_ONE">
+      <point x="0.0" y="-115.0" />
+      <point x="-1228.0" y="649.0" />
+      <point x="-1568.0" y="649.0" />
+      <point x="0.0" y="38.0" />
+    </edge>
+    <edge source="com.invincibilitypoints.invincibilitypointsmap.service.PhotoService" target="com.invincibilitypoints.invincibilitypointsmap.repository.PhotoRepository" relationship="TO_ONE">
+      <point x="0.0" y="-27.0" />
+      <point x="-748.0" y="709.0" />
+      <point x="-508.0" y="769.0" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="com.invincibilitypoints.invincibilitypointsmap.service.MapPointService" target="com.invincibilitypoints.invincibilitypointsmap.repository.ResourceRepository" relationship="TO_ONE">
+      <point x="0.0" y="-115.0" />
+      <point x="-1228.0" y="689.0" />
+      <point x="-1808.0" y="689.0" />
+      <point x="60.0" y="27.0" />
+    </edge>
+    <edge source="com.invincibilitypoints.invincibilitypointsmap.service.PhotoService" target="com.invincibilitypoints.invincibilitypointsmap.repository.MapPointRepository" relationship="TO_ONE">
+      <point x="0.0" y="-27.0" />
+      <point x="-748.0" y="749.0" />
+      <point x="-848.0" y="749.0" />
+      <point x="0.0" y="49.0" />
+    </edge>
+    <edge source="com.invincibilitypoints.invincibilitypointsmap.controller.MapPointController" target="com.invincibilitypoints.invincibilitypointsmap.service.MapPointService" relationship="TO_ONE">
+      <point x="0.0" y="-82.0" />
+      <point x="0.0" y="115.0" />
+    </edge>
+    <edge source="com.invincibilitypoints.invincibilitypointsmap.service.MapPointService" target="com.invincibilitypoints.invincibilitypointsmap.security.repository.UserRepository" relationship="TO_ONE">
+      <point x="0.0" y="-115.0" />
+      <point x="0.0" y="38.0" />
+    </edge>
+    <edge source="com.invincibilitypoints.invincibilitypointsmap.service.ResourceService" target="com.invincibilitypoints.invincibilitypointsmap.repository.ResourceRepository" relationship="TO_ONE">
+      <point x="0.0" y="-27.0" />
+      <point x="60.0" y="27.0" />
+    </edge>
+    <edge source="com.invincibilitypoints.invincibilitypointsmap.controller.ResourceController" target="com.invincibilitypoints.invincibilitypointsmap.service.ResourceService" relationship="TO_ONE">
+      <point x="0.0" y="-27.0" />
+      <point x="0.0" y="27.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Compact" zoom="1.1641983258209916" showDependencies="true" x="-324.0" y="569.0" />
+  <SelectedNodes>
+    <node>com.invincibilitypoints.invincibilitypointsmap.service.KeysService</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Methods</Category>
+    <Category>Properties</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+

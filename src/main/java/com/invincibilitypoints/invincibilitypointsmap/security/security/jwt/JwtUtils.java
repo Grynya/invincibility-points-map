@@ -1,19 +1,17 @@
 package com.invincibilitypoints.invincibilitypointsmap.security.security.jwt;
 
-import java.security.Key;
-import java.util.Date;
-import java.util.Locale;
-import java.util.ResourceBundle;
-
 import com.invincibilitypoints.invincibilitypointsmap.security.security.service.UserDetailsImpl;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-import io.jsonwebtoken.*;
+import java.security.Key;
+import java.util.Date;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 @Component
 public class JwtUtils {
@@ -62,19 +60,6 @@ public class JwtUtils {
         } catch (IllegalArgumentException e) {
             logger.error(errors.getString("empty_jwt_claims"), e.getMessage());
         }
-
         return false;
-    }
-
-    public ResponseEntity<Boolean> isLoggedIn(String authToken) {
-        try {
-            if (authToken != null && this.validateJwtToken(authToken)) {
-                String email = this.getEmailFromJwtToken(authToken);
-                return ResponseEntity.ok().body(email != null);
-            }
-        } catch (Exception e) {
-            logger.error(errors.getString("invalid_jwt_token"), e.getMessage());
-        }
-        return ResponseEntity.ok().body(false);
     }
 }

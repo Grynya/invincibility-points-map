@@ -22,6 +22,4 @@ public class OnRegistrationCompleteEvent extends ApplicationEvent {
         this.locale = locale;
         this.appUrl = appUrl;
     }
-
-    // standard getters and setters
 }

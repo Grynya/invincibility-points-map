@@ -48,16 +48,12 @@ public class MapPointService {
     }
 
     public ResponseEntity<?> filterPointsInBounds(PointRequest pointRequest) {
-        List<MapPoint> points = findByBoundsWithDislikes(pointRequest);
-        return ResponseEntity.ok().body(points.stream().map(MapPointDto::fromPoint).toList());
-    }
-
-    private List<MapPoint> findByBoundsWithDislikes(PointRequest pointRequest) {
-        return mapPointRepository.findByBoundsWithDislikes(
+        List<MapPoint> points = mapPointRepository.findByBoundsWithDislikes(
                 pointRequest.getSw().lat(),
                 pointRequest.getSw().lng(),
                 pointRequest.getNe().lat(),
                 pointRequest.getNe().lng());
+        return ResponseEntity.ok().body(points.stream().map(MapPointDto::fromPoint).toList());
     }
 
     @Transactional
@@ -86,9 +82,7 @@ public class MapPointService {
             }
         }
         mapPoint.setResources(resources);
-
         MapPoint mapPointCreated = mapPointRepository.save(mapPoint);
-
         return ResponseEntity.ok().body(new CreateMapPointResponse(mapPointCreated.getId()));
     }
 
@@ -105,55 +99,57 @@ public class MapPointService {
                 .build();
     }
 
-    public ResponseEntity<?> ratePoint(RatePointRequest ratePointRequest) {
-        Optional<MapPoint> pointOptional = mapPointRepository.findById(ratePointRequest.getPointId());
-        Optional<User> userOptional = userRepository.findById(ratePointRequest.getUserId());
-        if (userOptional.isEmpty())
+    private ResponseEntity<?> validateUserAndPoint(Optional<User> userOptional, Optional<MapPoint> pointOptional) {
+        if (userOptional.isEmpty()) {
             return ResponseEntity.badRequest().body(errors.getString("invalid_user_id"));
-        else if (pointOptional.isEmpty())
-            return ResponseEntity.badRequest().body(errors.getString("invalid_point_id"));
-        else {
-            Optional<RatedPoint> ratedPointOptional =
-                    ratedPointRepository.findByUserAndPoint(userOptional.get(), pointOptional.get());
-            ratedPointOptional
-                    .ifPresentOrElse(ratedPoint -> {
-                                ratedPoint.setRating(ratePointRequest.getRating());
-                                ratedPointRepository.save(ratedPoint);
-                            },
-                            () -> {
-                                RatedPoint ratedPoint = RatedPoint
-                                        .builder()
-                                        .point(pointOptional.get())
-                                        .user(userOptional.get())
-                                        .rating(ratePointRequest.getRating())
-                                        .build();
-                                ratedPointRepository.save(ratedPoint);
-                            });
-            return ResponseEntity.ok().build();
         }
+
+        if (pointOptional.isEmpty()) {
+            return ResponseEntity.badRequest().body(errors.getString("invalid_point_id"));
+        }
+
+        return null;
+    }
+
+    public ResponseEntity<?> ratePoint(RatePointRequest ratePointRequest) {
+        Long pointId = ratePointRequest.getPointId();
+        Long userId = ratePointRequest.getUserId();
+
+        Optional<MapPoint> pointOptional = mapPointRepository.findById(pointId);
+        Optional<User> userOptional = userRepository.findById(userId);
+
+        ResponseEntity<?> validationResponse = validateUserAndPoint(userOptional, pointOptional);
+        if (validationResponse != null) return validationResponse;
+
+        RatedPoint ratedPoint = ratedPointRepository.findByUserAndPoint(userOptional.get(), pointOptional.get())
+                .orElseGet(() -> RatedPoint.builder()
+                        .point(pointOptional.get())
+                        .user(userOptional.get())
+                        .build());
+
+        ratedPoint.setRating(ratePointRequest.getRating());
+        ratedPointRepository.save(ratedPoint);
+
+        return ResponseEntity.ok().build();
     }
 
     public ResponseEntity<?> getRatingOfPoint(Long pointId, Long userId) {
         Optional<MapPoint> pointOptional = mapPointRepository.findById(pointId);
         Optional<User> userOptional = userRepository.findById(userId);
-        if (userOptional.isEmpty())
-            return ResponseEntity.badRequest().body(errors.getString("invalid_user_id"));
-        else if (pointOptional.isEmpty())
-            return ResponseEntity.badRequest().body(errors.getString("invalid_point_id"));
-        else {
-            Optional<RatedPoint> ratedPointOptional =
-                    ratedPointRepository.findByUserAndPoint(userOptional.get(), pointOptional.get());
-            Integer numOfLikes = ratedPointRepository.countAllByPointAndRating(pointOptional.get(), ERating.LIKED);
-            Integer numOfDislikes = ratedPointRepository.countAllByPointAndRating(pointOptional.get(), ERating.DISLIKED);
 
-            return ratedPointOptional
-                    .map(ratedPoint -> ResponseEntity
-                            .ok()
-                            .body(new RatingResponse(ratedPointOptional.get().getRating(), numOfLikes, numOfDislikes)))
-                    .orElseGet(() -> ResponseEntity
-                            .ok()
-                            .body(new RatingResponse(ERating.NOT_RATED, numOfLikes, numOfDislikes)));
-        }
+        ResponseEntity<?> validationResponse = validateUserAndPoint(userOptional, pointOptional);
+        if (validationResponse != null) return validationResponse;
+
+        Integer numOfLikes = ratedPointRepository.countAllByPointAndRating(pointOptional.get(), ERating.LIKED);
+        Integer numOfDislikes = ratedPointRepository.countAllByPointAndRating(pointOptional.get(), ERating.DISLIKED);
+
+        RatedPoint ratedPoint = ratedPointRepository
+                .findByUserAndPoint(userOptional.get(), pointOptional.get())
+                .orElse(null);
+
+        ERating rating = (ratedPoint != null) ? ratedPoint.getRating() : ERating.NOT_RATED;
+
+        return ResponseEntity.ok().body(new RatingResponse(rating, numOfLikes, numOfDislikes));
     }
 
     public ResponseEntity<?> getPointsByUser(Long userId) {

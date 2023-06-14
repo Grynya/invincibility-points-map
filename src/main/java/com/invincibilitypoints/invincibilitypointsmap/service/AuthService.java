@@ -1,5 +1,6 @@
 package com.invincibilitypoints.invincibilitypointsmap.service;
 
+import com.invincibilitypoints.invincibilitypointsmap.dto.UserDto;
 import com.invincibilitypoints.invincibilitypointsmap.enums.EStatus;
 import com.invincibilitypoints.invincibilitypointsmap.enums.ETokenVerificationStatus;
 import com.invincibilitypoints.invincibilitypointsmap.payload.response.TokenVerificationResponse;
@@ -17,6 +18,8 @@ import com.invincibilitypoints.invincibilitypointsmap.security.payload.response.
 import com.invincibilitypoints.invincibilitypointsmap.security.repository.UserRepository;
 import com.invincibilitypoints.invincibilitypointsmap.security.security.jwt.JwtUtils;
 import com.invincibilitypoints.invincibilitypointsmap.security.security.service.UserDetailsImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -46,6 +49,7 @@ public class AuthService {
 
     @Value("${jwt_expiration_ms}")int jwtExpirationMs;
     ResourceBundle errors = ResourceBundle.getBundle("errors", new Locale("ua"));
+    private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
 
     public AuthService(RefreshTokenRepository refreshTokenRepository, AuthenticationManager authenticationManager, JwtUtils jwtUtils, UserRepository userRepository, VerificationTokenRepository verificationTokenRepository) {
         this.refreshTokenRepository = refreshTokenRepository;
@@ -59,8 +63,6 @@ public class AuthService {
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(
                         loginRequest.getUsername(), loginRequest.getPassword()));
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
@@ -79,9 +81,14 @@ public class AuthService {
                 userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet())));
     }
     public void createVerificationToken(User user, String token) {
-        VerificationToken myToken = new VerificationToken(token, user);
+        VerificationToken myToken = VerificationToken.builder()
+                .token(token)
+                .user(user)
+                .build();
+
         verificationTokenRepository.save(myToken);
     }
+
     public TokenVerificationResponse validateVerificationToken(String token) {
         final Optional<VerificationToken> verificationTokenOptional = verificationTokenRepository.findByToken(token);
         if (verificationTokenOptional.isPresent()) {
@@ -125,17 +132,18 @@ public class AuthService {
     }
 
     private RefreshToken createRefreshToken(Long userId) {
-        RefreshToken refreshToken = new RefreshToken();
+        RefreshToken refreshToken = RefreshToken.builder()
+                .expiryDate(Instant.now().plusMillis(refreshTokenDurationMs))
+                .token(UUID.randomUUID().toString())
+                .build();
 
-        if(userRepository.findById(userId).isPresent())
-            refreshToken.setUser(userRepository.findById(userId).get());
-
-        refreshToken.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
-        refreshToken.setToken(UUID.randomUUID().toString());
+        userRepository.findById(userId)
+                .ifPresent(refreshToken::setUser);
 
         refreshToken = refreshTokenRepository.save(refreshToken);
         return refreshToken;
     }
+
     public ResponseEntity<?> refreshToken(TokenRefreshRequest request) {
         String requestRefreshToken = request.getRefreshToken();
         return findByToken(requestRefreshToken)
@@ -179,5 +187,24 @@ public class AuthService {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new MessageResponse(e.getMessage()));
         }
+    }
+    public ResponseEntity<Boolean> isLoggedIn(String authToken) {
+        try {
+            if (authToken != null && jwtUtils.validateJwtToken(authToken)) {
+                String email = jwtUtils.getEmailFromJwtToken(authToken);
+                return ResponseEntity.ok().body(email != null);
+            }
+        } catch (Exception e) {
+            logger.error(errors.getString("invalid_jwt_token"), e.getMessage());
+        }
+        return ResponseEntity.ok().body(false);
+    }
+
+    public ResponseEntity<?> getUserInfoByAccessToken(String accessToken) {
+        String username = jwtUtils.getEmailFromJwtToken(accessToken);
+        Optional<User> user = userRepository.findByEmail(username);
+        if (user.isEmpty())
+            return ResponseEntity.badRequest().body(new MessageResponse(errors.getString("invalid_user_id")));
+        return ResponseEntity.ok(UserDto.fromUser(user.get()));
     }
 }
