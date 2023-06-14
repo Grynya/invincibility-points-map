@@ -31,5 +31,5 @@ public class Resource {
             name = "point_resources",
             joinColumns = @JoinColumn(name = "resource_id"),
             inverseJoinColumns = @JoinColumn(name = "point_id"))
-    Set<Point> points;
+    Set<MapPoint> points;
 }

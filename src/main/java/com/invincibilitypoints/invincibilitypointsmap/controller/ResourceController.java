@@ -3,6 +3,7 @@ package com.invincibilitypoints.invincibilitypointsmap.controller;
 import com.invincibilitypoints.invincibilitypointsmap.dto.ResourceDto;
 import com.invincibilitypoints.invincibilitypointsmap.service.ResourceService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,7 +20,7 @@ public class ResourceController {
     }
 
     @GetMapping
-    public List<ResourceDto> getResources(){
+    public ResponseEntity<List<ResourceDto>> getResources(){
         return resourceService.getResources();
     }
 }

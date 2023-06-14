@@ -3,6 +3,7 @@ package com.invincibilitypoints.invincibilitypointsmap.service;
 import com.invincibilitypoints.invincibilitypointsmap.dto.ResourceDto;
 import com.invincibilitypoints.invincibilitypointsmap.repository.ResourceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,7 +17,7 @@ public class ResourceService {
         this.resourceRepository = resourceRepository;
     }
 
-    public List<ResourceDto> getResources() {
-        return resourceRepository.getAllDto();
+    public ResponseEntity<List<ResourceDto>> getResources() {
+        return ResponseEntity.ok().body(resourceRepository.getAllDto());
     }
 }

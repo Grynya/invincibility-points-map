@@ -1,0 +1,6 @@
+package com.invincibilitypoints.invincibilitypointsmap.payload.response;
+
+import com.invincibilitypoints.invincibilitypointsmap.enums.ETokenVerificationStatus;
+import com.invincibilitypoints.invincibilitypointsmap.security.payload.response.JwtResponse;
+
+public record TokenVerificationResponse(ETokenVerificationStatus eTokenVerificationStatus, JwtResponse jwtResponse){}
