@@ -20,25 +20,25 @@
 - Administrators can manage users and their points on the map.
 
 ### Architecture
-<img src="./images/structure.png" alt="layers" style="width:100%;"/>
+<img src="./images/structure.png" alt="layers"  style="width:70%;"/>
 
 ### Technology stack
-<img src="./images/technologies.png" alt="TS" style="width:100%;"/>
+<img src="./images/technologies.png" alt="TS"  style="width:70%;"/>
 
 ### Database scheme
-<img src="./images/database.png" alt="db" style="width:100%;"/>
+<img src="./images/database.png" alt="db"  style="width:70%;"/>
 
 ## Demonstration
 
 ### Main page
-<img src="./images/map.png" alt="map" style="width:100%;"/>
+<img src="./images/map.png" alt="map"  style="width:70%;"/>
 
 ### Point description
-<img src="./images/point-desc.png" alt="point-desc" style="width:100%;"/>
+<img src="./images/point-desc.png" alt="point-desc"  style="width:70%;"/>
 
 ### Point creation
-<img src="./images/point-creation.png" alt="point-creation" style="width:100%;"/>
+<img src="./images/point-creation.png" alt="point-creation"  style="width:70%;"/>
 
 ### Admin Page
-Managing users and their points on the map
-<img src="./images/admin.png" alt="admin" style="width:500px;"/>
+Managing users and their points on the map</br>
+<img src="./images/admin.png" alt="admin" style="width:70%;"/>
