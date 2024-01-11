@@ -100,9 +100,9 @@ SET @end_id = (SELECT MAX(id)
                FROM user);
 
 INSERT INTO rated_point (rating, user_id, point_id)
-SELECT 'DISLIKED', id, 1
+SELECT 'DISLIKED', id, 122
 FROM user
-WHERE id BETWEEN ((SELECT MAX(id) - 19 FROM user)) AND ((SELECT MAX(id) FROM user));
+WHERE id BETWEEN ((SELECT MIN(id)+6 FROM user)) AND ((SELECT MIN(id)+10 FROM user));
 
 -- inserting points
 INSERT INTO map_point (coordinates, description, hours_of_work, is_deleted, name, phone, user_owner)
@@ -124,7 +124,7 @@ VALUES
     (POINT(50.294846 + (RAND() * 0.06 - 0.01), 30.475293 + (RAND() * 0.06 - 0.01)), 'Приємні ціни та швидке обслуговування', '10.00-21.00', false, 'Їдальня New life', '654534432', 15),
     (POINT(50.294846 + (RAND() * 0.06 - 0.01), 30.475293 + (RAND() * 0.06 - 0.01)), 'Маємо 5 генераторів', '06.00-22.00', false, 'Ворк-плейс', '436562434', 16),
     (POINT(50.294846 + (RAND() * 0.06 - 0.01), 30.475293 + (RAND() * 0.06 - 0.01)), 'Безкоштовний інтернет та електроенергія', '10.00-21.00', false, 'Ворк-плейс', '345545634', 17);
-50.294846, 30.475293
+
 -- insert resources
 SET @start_id = (SELECT MIN(id)
                  FROM map_point);
@@ -132,7 +132,7 @@ SET @end_id = (SELECT MAX(id)
                FROM map_point);
 
 INSERT INTO point_resources (resource_id, point_id)
-SELECT FLOOR(RAND() * 9) + 1, id
+SELECT 9, id
 FROM map_point
-WHERE id BETWEEN @start_id AND @end_id;
+WHERE name='Кафе Їжачок';
 

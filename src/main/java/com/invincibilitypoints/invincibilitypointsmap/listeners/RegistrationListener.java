@@ -9,13 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamSource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.InputStream;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.UUID;
@@ -29,10 +29,13 @@ public class RegistrationListener implements
     private final JavaMailSender mailSender;
     ResourceBundle messages = ResourceBundle.getBundle("messages", new Locale("ua"));
 
+    private final ResourceLoader resourceLoader;
+
     @Autowired
-    public RegistrationListener(AuthService authService, JavaMailSender mailSender) {
+    public RegistrationListener(AuthService authService, JavaMailSender mailSender, ResourceLoader resourceLoader) {
         this.authService = authService;
         this.mailSender = mailSender;
+        this.resourceLoader = resourceLoader;
     }
 
     @Override
@@ -66,17 +69,16 @@ public class RegistrationListener implements
         MimeMessage email = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(email, true, "UTF-8");
 
-        InputStreamSource logoInputStreamSource = new ByteArrayResource(Files
-                .readAllBytes(Paths
-                        .get("src/main/java/com/invincibilitypoints/invincibilitypointsmap/listeners/img/logo.png")));
-        helper.addAttachment("logo.png", logoInputStreamSource, "image/svg+xml");
-        try {
+        try (InputStream inputStream = resourceLoader.getResource("classpath:logo.png").getInputStream()) {
+            InputStreamSource logoInputStreamSource = new ByteArrayResource(inputStream.readAllBytes());
+            helper.addAttachment("logo.png", logoInputStreamSource, "image/svg+xml");
             helper.setTo(recipientAddress);
             helper.setSubject(subject);
             helper.setText(message, true);
-        } catch (MessagingException e) {
+        } catch (IOException | MessagingException  e) {
             e.printStackTrace();
         }
+
         mailSender.send(email);
     }
 
